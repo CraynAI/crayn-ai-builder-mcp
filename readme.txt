@@ -18,7 +18,7 @@ Crayn Safe MCP gives AI agents like Claude Desktop, Claude Code and Cursor a saf
 
 **Safe by design.** Every write can be previewed first, is logged with a before and after snapshot and can be reverted. Plugin updates take a backup and roll back if the site breaks. A read-only switch blocks every write.
 
-**Works with your stack.** Dedicated tools for Rank Math, WPBakery and Elementor. Rank Math and Yoast's own abilities are exposed through the same safety layer.
+**Works with your stack.** Dedicated tools for Rank Math, WPBakery and Elementor. Rank Math and Yoast's own abilities can be turned on in the settings and go through the same safety layer.
 
 Built on the official WordPress MCP Adapter (GPL), which is included unmodified, so there is nothing else to install. This plugin is developed by Crayn AI and is not affiliated with or endorsed by the WordPress Foundation.
 
@@ -30,7 +30,7 @@ Built on the official WordPress MCP Adapter (GPL), which is included unmodified,
 * Elementor: list widgets and their controls, read a page as a tree, add, update, move, duplicate and remove elements by id, replace the tree, set page settings, turn a post into an Elementor page. Parts you do not touch are written back byte for byte; V4 atomic elements can be read, moved and removed.
 * Site settings: read and atomically change an allow-list of options (title, tagline, timezone, formats, language, reading, comments, permalinks, image sizes). Secrets, URLs, roles and plugin lists can never be changed.
 * Menus: list and read menus, create, rename and delete them, add, edit, move and remove items, assign theme locations; deleted menus and items come back with a revert.
-* Rank Math parity: every editor field (focus keywords, robots, social, schema, redirects) via rankmath-get / rankmath-update / rankmath-schema-set / rankmath-schema-delete / rankmath-redirect-set / rankmath-analyze, plus safe wrappers for Rank Math and Yoast own abilities (dry run, option snapshot, revert).
+* Rank Math parity: every editor field (focus keywords, robots, social, schema, redirects) via rankmath-get / rankmath-update / rankmath-schema-set / rankmath-schema-delete / rankmath-redirect-set / rankmath-analyze, plus optional safe wrappers for Rank Math and Yoast own abilities (off by default; dry run, option snapshot, revert).
 * Plugins: safe updates with automatic zip backup, site health check and automatic rollback; activation changes with the same health check; rollback from backups; backup and update listings.
 * Site: site health and the change log (list changes, revert changes).
 

@@ -3,7 +3,7 @@
 Direct, ready-to-call tools for AI agents, with a safety layer on every write: preview, change log and one-call revert. Plugin updates take a backup and roll back automatically if the site breaks.
 
 - **Direct tools:** every tool is listed to the agent with its full schema, with no discover-inspect-execute round trips.
-- **57 built-in tools:** content, SEO, Rank Math, WPBakery, Elementor, plugins, site health, site settings and menus. The Rank Math, WPBakery and Elementor tools appear only on sites that use those plugins; Rank Math and Yoast's own abilities are added on sites that use them.
+- **57 built-in tools:** content, SEO, Rank Math, WPBakery, Elementor, plugins, site health, site settings and menus. The Rank Math, WPBakery and Elementor tools appear only on sites that use those plugins; Rank Math and Yoast's own abilities can be added with a setting (off by default, because they add up to about 40 tools).
 - **Safe by design:** dry run, before and after snapshots, revert, read-only mode.
 
 Built on the [official WordPress MCP Adapter](https://github.com/wordpress/mcp-adapter) (GPL), included unmodified. Developed by Crayn AI; not affiliated with or endorsed by the WordPress Foundation.
@@ -111,10 +111,10 @@ Auto-detects **Rank Math** or **Yoast** (top-level custom SEO fields; no plugin 
 
 `post-create` and `post-update` also accept an optional `rankmath` object (same fields as `rankmath-update`), so a post and all of its SEO data can be written in one call and one change row; reverting restores both.
 
-**External abilities** (setting *Rank Math / Yoast abilities*, on by default). Abilities registered by Rank Math (`rank-math/...`) and Yoast SEO (`yoast-seo/...`):
+**External abilities** (setting *Rank Math / Yoast abilities*, off by default). Abilities registered by Rank Math (`rank-math/...`) and Yoast SEO (`yoast-seo/...`):
 
-* read-only ones are listed on the MCP server directly;
-* writing ones are never exposed raw. For each of them Crayn Safe registers `crayn-safe/ext-<name>` which honours read-only mode and `dry_run` (returns the input and the current option snapshot), snapshots the plugin options first (`rank-math-options-*` and `rank_math_modules` for Rank Math; `wpseo`, `wpseo_titles`, `wpseo_social`, `wpseo_llmstxt` for Yoast), runs the original ability, logs `before`/`after` and can be undone with `change-revert` (options are restored exactly). While the setting is on, the original writing abilities are also hidden from the MCP Adapter's default server (`meta.mcp.public = false`).
+* while the setting is on, read-only ones are listed on the MCP server directly;
+* writing ones are never exposed raw, whatever the setting says. While the setting is on, Crayn Safe registers for each of them `crayn-safe/ext-<name>` which honours read-only mode and `dry_run` (returns the input and the current option snapshot), snapshots the plugin options first (`rank-math-options-*` and `rank_math_modules` for Rank Math; `wpseo`, `wpseo_titles`, `wpseo_social`, `wpseo_llmstxt` for Yoast), runs the original ability, logs `before`/`after` and can be undone with `change-revert` (options are restored exactly). The original writing abilities stay hidden from the MCP Adapter's default server (`meta.mcp.public = false`), so with the setting off they are not reachable over MCP.
 
 Note: the wrapper restores plugin options only. If an original ability also writes other data (for example post meta), that part is not reverted.
 
