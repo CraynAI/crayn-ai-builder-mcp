@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Crayn Safe MCP
- * Plugin URI:        https://www.crayn.ai/
+ * Plugin URI:        https://github.com/CraynAI/crayn-safe-mcp
  * Description:       Gives AI agents direct, ready-to-call tools for your site, with a safety layer: every write can be previewed, is logged and can be reverted. Built on the official WordPress MCP Adapter, included.
  * Version:           1.0.0
  * Requires at least: 6.9
