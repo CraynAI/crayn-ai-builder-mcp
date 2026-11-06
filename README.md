@@ -2,11 +2,68 @@
 
 # Crayn AI Builder MCP
 
-Direct, ready-to-call tools for AI agents, with a safety layer on every write: preview, change log and one-call revert. Plugin updates take a backup and roll back automatically if the site breaks.
+**Let AI agents build and manage your WordPress site, and keep the last word yourself.**
+
+Connect Claude Desktop, Claude Code, Cursor or any MCP client to your site. The agent gets 57 ready-to-call tools for pages, SEO, menus, settings and plugins. You get a preview before any write, a record of every change, and a Revert button.
+
+[Install](#install) · [Connect a client](#connect-claude-desktop--claude-code--cursor) · [All tools](#what-it-registers) · [Safety model](#the-safety-model-in-one-paragraph)
+
+| | |
+|---|---|
+| **Works with** | WordPress 6.9+, PHP 7.4+, Elementor, WPBakery, Rank Math, Yoast SEO |
+| **Clients** | Claude Desktop, Claude Code, Cursor and other MCP clients |
+| **Status** | 1.0.0 on GitHub. WordPress.org directory review in progress. |
+
+## See it work
+
+Everything below comes from a real run on our test site, using the plugin's own tools. Only the site address in the settings screenshot is masked.
+
+### Preview it. Apply it. Take it back.
+
+An agent builds a campaign section in Elementor, changes the heading after a dry run, and the change is reverted with one click.
+
+![The same Elementor page before the change, after the change, and after the revert](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/flow.png)
+
+### Nothing is written during a dry run
+
+Every write tool accepts `dry_run: true` and answers with the planned before and after. `change_id: 0` means nothing was stored.
+
+![Dry run output showing the heading before and after, with change_id 0](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/dry-run.png)
+
+### Every change has a record, and a way back
+
+Each real write is logged with a before and after snapshot. Revert it from the settings page, or let the agent call `change-revert`. The revert is logged as well, and the same change cannot be reverted twice.
+
+![Change log with the reverted entry and a success notice](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/change-log.png)
+
+### Page builders as real structure
+
+The agent reads a page as a tree of elements and changes one element at a time, so it does not have to rewrite a page's raw markup. Placement rules are checked before a WPBakery element is added.
+
+![An Elementor page and a WPBakery page built through tools, with their element trees](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/builders.png)
+
+### SEO fields, and a hard stop
+
+Rank Math or Yoast is detected automatically, and old values go into the log. Turn on read-only mode and every write is refused, while reads and dry runs keep working.
+
+![SEO update with old and new values, and a write refused in read-only mode](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/seo-readonly.png)
+
+### You decide what the agent can touch
+
+Switch whole categories on or off, turn on read-only mode, and copy a ready-made client configuration.
+
+![Settings page with categories, read-only mode, endpoint and client snippet](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/settings.png)
+
+## What you get
 
 - **Direct tools:** every tool is listed to the agent with its full schema, with no discover-inspect-execute round trips.
-- **57 built-in tools:** content, SEO, Rank Math, WPBakery, Elementor, plugins, site health, site settings and menus. The Rank Math, WPBakery and Elementor tools appear only on sites that use those plugins; Rank Math and Yoast's own abilities can be added with a setting (off by default, because they add up to about 40 tools).
-- **Safe by design:** dry run, before and after snapshots, revert, read-only mode.
+- **57 built-in tools:** content, SEO, Rank Math, WPBakery, Elementor, plugins, site health, site settings and menus. The Rank Math, WPBakery and Elementor tools appear only on sites that use those plugins. Rank Math and Yoast's own abilities can be turned on in the settings, up to about 40 more; their writing abilities are only reachable through safe wrappers.
+- **Safe by design:** dry run, before and after snapshots, revert, read-only mode. Posts go to the trash, never straight to deletion.
+- **Safer plugin updates:** a zip backup first, then a health check, with automatic rollback if the site breaks.
+
+## How it is tested
+
+On WordPress 7.1 with PHP 8.5: 1,266 end-to-end checks passed, 0 failed and 28 skipped; Plugin Check reports 0 errors. Not yet tested on multisite or with Elementor Pro.
 
 Built on the [official WordPress MCP Adapter](https://github.com/wordpress/mcp-adapter) (GPL), included unmodified. Developed by Yunus Doğukan OĞLAKCI (CraynAI); not affiliated with or endorsed by the WordPress Foundation.
 
