@@ -2,10 +2,10 @@
 /**
  * Site health check used after every plugin write operation.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ class HealthCheck {
 	 */
 	private static function check_url( $url, $code ) {
 		// Cache buster: a page cache would otherwise serve the old, healthy HTML.
-		$url      = add_query_arg( 'crayn_safe_health', wp_generate_password( 12, false ), $url );
+		$url      = add_query_arg( 'craynai_health', wp_generate_password( 12, false ), $url );
 		$response = wp_remote_get(
 			$url,
 			array(
@@ -76,12 +76,12 @@ class HealthCheck {
 	 * @return true|\WP_Error
 	 */
 	public static function check() {
-		$frontend = self::check_url( home_url( '/' ), 'crayn_safe_health_frontend' );
+		$frontend = self::check_url( home_url( '/' ), 'craynai_health_frontend' );
 		if ( is_wp_error( $frontend ) ) {
 			return $frontend;
 		}
 
-		$admin = self::check_url( admin_url(), 'crayn_safe_health_admin' );
+		$admin = self::check_url( admin_url(), 'craynai_health_admin' );
 		if ( is_wp_error( $admin ) ) {
 			return $admin;
 		}

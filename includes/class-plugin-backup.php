@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin backup/restore system for Crayn Safe MCP.
+ * Plugin backup/restore system for Crayn AI Builder MCP.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Zips plugin folders into {uploads}/crayn-safe-backups/plugins/ before any
+ * Zips plugin folders into {uploads}/craynai-backups/plugins/ before any
  * plugin write, and restores them when a health check fails or on request.
  */
 class PluginBackup {
@@ -24,10 +24,10 @@ class PluginBackup {
 	public static function backup_dir() {
 		$uploads = wp_get_upload_dir();
 		if ( empty( $uploads['error'] ) && ! empty( $uploads['basedir'] ) ) {
-			return $uploads['basedir'] . '/crayn-safe-backups/plugins';
+			return $uploads['basedir'] . '/craynai-backups/plugins';
 		}
 		// Fallback for exotic setups only: keep the previous path.
-		return WP_CONTENT_DIR . '/crayn-safe-backups/plugins';
+		return WP_CONTENT_DIR . '/craynai-backups/plugins';
 	}
 
 	/**
@@ -148,7 +148,7 @@ class PluginBackup {
 
 		$source = self::plugin_source( $plugin_file );
 		if ( null === $source ) {
-			return new \WP_Error( 'crayn_safe_plugin_not_found', sprintf( 'Plugin file "%s" does not exist.', $plugin_file ) );
+			return new \WP_Error( 'craynai_plugin_not_found', sprintf( 'Plugin file "%s" does not exist.', $plugin_file ) );
 		}
 
 		$data    = get_plugin_data( WP_PLUGIN_DIR . '/' . ltrim( $plugin_file, '/' ), false, false );
@@ -159,7 +159,7 @@ class PluginBackup {
 		// The folder's web protection is written through the filesystem layer: without
 		// it, a backup would sit unprotected under uploads.
 		if ( null === self::filesystem() ) {
-			return new \WP_Error( 'crayn_safe_fs_unavailable', 'Could not initialize the WordPress filesystem; no backup was taken, nothing was changed.' );
+			return new \WP_Error( 'craynai_fs_unavailable', 'Could not initialize the WordPress filesystem; no backup was taken, nothing was changed.' );
 		}
 		$dir        = self::ensure_backup_dir();
 		$created_at = gmdate( 'Y-m-d H:i:s' );
@@ -184,7 +184,7 @@ class PluginBackup {
 			$zip = new \ZipArchive();
 			$res = $zip->open( $zip_path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 			if ( true !== $res ) {
-				return new \WP_Error( 'crayn_safe_zip_open_failed', sprintf( 'Could not create backup zip (code %s).', $res ) );
+				return new \WP_Error( 'craynai_zip_open_failed', sprintf( 'Could not create backup zip (code %s).', $res ) );
 			}
 			foreach ( $abs_files as $pair ) {
 				$zip->addFile( $pair[0], $pair[1] );
@@ -202,18 +202,18 @@ class PluginBackup {
 			);
 			$result  = $archive->create( $paths, PCLZIP_OPT_REMOVE_PATH, ( 'singlefile' === $source['type'] ? dirname( $source['source'] ) : $source['source'] ) );
 			if ( 0 === $result ) {
-				return new \WP_Error( 'crayn_safe_zip_create_failed', 'Could not create backup zip (PclZip): ' . $archive->errorInfo( true ) );
+				return new \WP_Error( 'craynai_zip_create_failed', 'Could not create backup zip (PclZip): ' . $archive->errorInfo( true ) );
 			}
 		}
 
 		if ( ! file_exists( $zip_path ) || empty( $abs_files ) ) {
-			return new \WP_Error( 'crayn_safe_zip_missing', 'Backup zip was not written (or the plugin has no files).' );
+			return new \WP_Error( 'craynai_zip_missing', 'Backup zip was not written (or the plugin has no files).' );
 		}
 		// Never continue an update on an incomplete backup.
 		if ( class_exists( 'ZipArchive' ) ) {
 			$check = new \ZipArchive();
 			if ( true !== $check->open( $zip_path ) || $check->numFiles !== count( $abs_files ) ) {
-				return new \WP_Error( 'crayn_safe_zip_incomplete', 'Backup zip verification failed: file count does not match the plugin.' );
+				return new \WP_Error( 'craynai_zip_incomplete', 'Backup zip verification failed: file count does not match the plugin.' );
 			}
 			$check->close();
 		}
@@ -227,11 +227,11 @@ class PluginBackup {
 		);
 		$fs = self::filesystem();
 		if ( null === $fs ) {
-			return new \WP_Error( 'crayn_safe_fs_unavailable', 'Could not initialize the WordPress filesystem (needed to store the backup metadata).' );
+			return new \WP_Error( 'craynai_fs_unavailable', 'Could not initialize the WordPress filesystem (needed to store the backup metadata).' );
 		}
 		if ( ! $fs->put_contents( $dir . '/' . $filename . '.json', wp_json_encode( $meta, JSON_UNESCAPED_SLASHES ), FS_CHMOD_FILE ) ) {
 			wp_delete_file( $zip_path );
-			return new \WP_Error( 'crayn_safe_backup_meta_failed', 'Could not store the backup metadata; the backup was discarded.' );
+			return new \WP_Error( 'craynai_backup_meta_failed', 'Could not store the backup metadata; the backup was discarded.' );
 		}
 
 		clearstatcache();
@@ -306,7 +306,7 @@ class PluginBackup {
 		$zip_path    = self::backup_dir() . '/' . $backup_file;
 
 		if ( ! file_exists( $zip_path ) ) {
-			return new \WP_Error( 'crayn_safe_backup_not_found', sprintf( 'Backup file "%s" does not exist.', $backup_file ) );
+			return new \WP_Error( 'craynai_backup_not_found', sprintf( 'Backup file "%s" does not exist.', $backup_file ) );
 		}
 
 		$meta = array();
@@ -324,12 +324,12 @@ class PluginBackup {
 		WP_Filesystem();
 		global $wp_filesystem;
 		if ( ! $wp_filesystem || ( defined( 'FS_METHOD' ) && 'direct' !== FS_METHOD && ! $wp_filesystem->connect() ) ) {
-			return new \WP_Error( 'crayn_safe_fs_unavailable', 'Could not initialize the WordPress filesystem (needed to restore plugin files).' );
+			return new \WP_Error( 'craynai_fs_unavailable', 'Could not initialize the WordPress filesystem (needed to restore plugin files).' );
 		}
 
 		$temp = wp_tempnam( $backup_file );
 		if ( ! $temp ) {
-			return new \WP_Error( 'crayn_safe_temp_failed', 'Could not create a temporary directory for the restore.' );
+			return new \WP_Error( 'craynai_temp_failed', 'Could not create a temporary directory for the restore.' );
 		}
 		if ( is_file( $temp ) ) {
 			wp_delete_file( $temp );
@@ -340,14 +340,14 @@ class PluginBackup {
 		$unzipped = unzip_file( $zip_path, $temp );
 		if ( is_wp_error( $unzipped ) ) {
 			self::rrmdir( $temp );
-			return new \WP_Error( 'crayn_safe_unzip_failed', 'Could not unzip the backup: ' . $unzipped->get_error_message() );
+			return new \WP_Error( 'craynai_unzip_failed', 'Could not unzip the backup: ' . $unzipped->get_error_message() );
 		}
 
 		$plugin_file = isset( $meta['plugin_file'] ) ? (string) $meta['plugin_file'] : '';
 		$source      = '' !== $plugin_file ? self::plugin_source( $plugin_file ) : null;
 		if ( null === $source ) {
 			self::rrmdir( $temp );
-			return new \WP_Error( 'crayn_safe_plugin_not_found', sprintf( 'Plugin file "%s" no longer resolves; cannot restore the backup.', $plugin_file ) );
+			return new \WP_Error( 'craynai_plugin_not_found', sprintf( 'Plugin file "%s" no longer resolves; cannot restore the backup.', $plugin_file ) );
 		}
 
 		// The zip root holds the plugin folder's contents (folder plugins) or the
@@ -358,24 +358,24 @@ class PluginBackup {
 			$extracted = $temp . '/' . basename( $plugin_file );
 			if ( ! file_exists( $extracted ) ) {
 				self::rrmdir( $temp );
-				return new \WP_Error( 'crayn_safe_unzip_empty', 'The backup zip does not contain the plugin file; nothing was changed.' );
+				return new \WP_Error( 'craynai_unzip_empty', 'The backup zip does not contain the plugin file; nothing was changed.' );
 			}
 			$copied = $wp_filesystem->copy( $extracted, $plugins_dir . '/' . $plugin_file, true, FS_CHMOD_FILE );
 			if ( ! $copied ) {
 				self::rrmdir( $temp );
-				return new \WP_Error( 'crayn_safe_restore_copy_failed', 'Could not copy the restored plugin file into place.' );
+				return new \WP_Error( 'craynai_restore_copy_failed', 'Could not copy the restored plugin file into place.' );
 			}
 		} else {
 			if ( ! file_exists( $temp . '/' . basename( $plugin_file ) ) ) {
 				self::rrmdir( $temp );
-				return new \WP_Error( 'crayn_safe_unzip_empty', 'The backup zip does not contain the plugin main file; nothing was changed.' );
+				return new \WP_Error( 'craynai_unzip_empty', 'The backup zip does not contain the plugin main file; nothing was changed.' );
 			}
 			$dest_dir  = $plugins_dir . '/' . $source['slug'];
-			$aside_dir = $dest_dir . '.crayn-safe-old-' . time();
+			$aside_dir = $dest_dir . '.craynai-old-' . time();
 			// Move the current folder aside first, so a failed copy can be undone.
 			if ( is_dir( $dest_dir ) && ! $wp_filesystem->move( $dest_dir, $aside_dir, true ) ) {
 				self::rrmdir( $temp );
-				return new \WP_Error( 'crayn_safe_restore_move_failed', 'Could not move the current plugin folder aside; nothing was changed.' );
+				return new \WP_Error( 'craynai_restore_move_failed', 'Could not move the current plugin folder aside; nothing was changed.' );
 			}
 			$wp_filesystem->mkdir( $dest_dir, FS_CHMOD_DIR );
 			$copied = copy_dir( $temp, $dest_dir );
@@ -383,7 +383,7 @@ class PluginBackup {
 				$wp_filesystem->rmdir( $dest_dir, true );
 				$wp_filesystem->move( $aside_dir, $dest_dir, true );
 				self::rrmdir( $temp );
-				return new \WP_Error( 'crayn_safe_restore_copy_failed', 'Could not copy backup files into place (previous files were put back): ' . $copied->get_error_message() );
+				return new \WP_Error( 'craynai_restore_copy_failed', 'Could not copy backup files into place (previous files were put back): ' . $copied->get_error_message() );
 			}
 			// Restored copy is in place; drop the replaced version.
 			$wp_filesystem->rmdir( $aside_dir, true );
@@ -401,7 +401,7 @@ class PluginBackup {
 			}
 			$result = activate_plugin( $plugin_file, '', $network_wide );
 			if ( is_wp_error( $result ) ) {
-				return new \WP_Error( 'crayn_safe_reactivate_failed', 'Files were restored but the plugin could not be re-activated: ' . $result->get_error_message() );
+				return new \WP_Error( 'craynai_reactivate_failed', 'Files were restored but the plugin could not be re-activated: ' . $result->get_error_message() );
 			}
 			$reactivated = true;
 		}

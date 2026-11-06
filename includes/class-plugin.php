@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin bootstrap for Crayn Safe MCP.
+ * Plugin bootstrap for Crayn AI Builder MCP.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,13 +35,13 @@ class Plugin {
 		ExternalAbilities::init();
 
 		// The adapter fires this while initializing (rest_api_init, or init:20 in WP-CLI);
-		// our server lists all Crayn Safe abilities as direct tools, and we keep
+		// our server lists all CraynAI abilities as direct tools, and we keep
 		// meta.mcp.public = true on every ability so the default discovery server finds them too.
 		add_action( 'mcp_adapter_init', array( self::class, 'create_mcp_server' ) );
 
 		// Start the bundled adapter only when the canonical plugin is not active:
 		// the canonical plugin initializes its own copy, and ours stays unloaded.
-		if ( CRAYN_SAFE_MCP_BUNDLED_ADAPTER && class_exists( '\\WP\\MCP\\Core\\McpAdapter' ) ) {
+		if ( CRAYN_AI_BUILDER_MCP_BUNDLED_ADAPTER && class_exists( '\\WP\\MCP\\Core\\McpAdapter' ) ) {
 			\WP\MCP\Core\McpAdapter::instance();
 		}
 
@@ -64,61 +64,61 @@ class Plugin {
 		if ( class_exists( 'WP\MCP\Core\McpAdapter' ) ) {
 			return;
 		}
-		$adapter_active = ( defined( 'CRAYN_SAFE_MCP_BUNDLED_ADAPTER' ) && CRAYN_SAFE_MCP_BUNDLED_ADAPTER );
-		if ( crayn_safe_mcp_canonical_adapter_active() && ! $adapter_active ) {
+		$adapter_active = ( defined( 'CRAYN_AI_BUILDER_MCP_BUNDLED_ADAPTER' ) && CRAYN_AI_BUILDER_MCP_BUNDLED_ADAPTER );
+		if ( crayn_ai_builder_mcp_canonical_adapter_active() && ! $adapter_active ) {
 			printf(
 				'<div class="notice notice-error"><p><strong>%s:</strong> %s</p></div>',
-				esc_html__( 'Crayn Safe MCP', 'crayn-safe-mcp' ),
-				esc_html__( 'The MCP Adapter plugin is active, but its adapter classes did not load, so MCP clients cannot reach the site. Check the MCP Adapter plugin installation (its vendor/ directory).', 'crayn-safe-mcp' )
+				esc_html__( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ),
+				esc_html__( 'The MCP Adapter plugin is active, but its adapter classes did not load, so MCP clients cannot reach the site. Check the MCP Adapter plugin installation (its vendor/ directory).', 'crayn-ai-builder-mcp' )
 			);
 			return;
 		}
 		printf(
 			'<div class="notice notice-error"><p><strong>%s:</strong> %s</p></div>',
-			esc_html__( 'Crayn Safe MCP', 'crayn-safe-mcp' ),
-			esc_html__( 'The MCP Adapter was not loaded, so MCP clients cannot reach the site. Make sure vendor/ exists in the plugin directory (run "composer install --no-dev").', 'crayn-safe-mcp' )
+			esc_html__( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ),
+			esc_html__( 'The MCP Adapter was not loaded, so MCP clients cannot reach the site. Make sure vendor/ exists in the plugin directory (run "composer install --no-dev").', 'crayn-ai-builder-mcp' )
 		);
 	}
 
 	/**
-	 * Register the four Crayn safety categories.
+	 * Register the CraynAI categories.
 	 *
 	 * @return void
 	 */
 	public static function register_categories() {
 		wp_register_ability_category(
-			'crayn-content',
+			'craynai-content',
 			array(
-				'label'       => __( 'Crayn: Content', 'crayn-safe-mcp' ),
-				'description' => __( 'Safe content management: posts, media and terms with preview, logging and revert.', 'crayn-safe-mcp' ),
+				'label'       => __( 'Crayn: Content', 'crayn-ai-builder-mcp' ),
+				'description' => __( 'Safe content management: posts, media and terms with preview, logging and revert.', 'crayn-ai-builder-mcp' ),
 			)
 		);
 		wp_register_ability_category(
-			'crayn-seo',
+			'craynai-seo',
 			array(
-				'label'       => __( 'Crayn: SEO', 'crayn-safe-mcp' ),
-				'description' => __( 'Safe SEO field management for Rank Math and Yoast with old-value logging.', 'crayn-safe-mcp' ),
+				'label'       => __( 'Crayn: SEO', 'crayn-ai-builder-mcp' ),
+				'description' => __( 'Safe SEO field management for Rank Math and Yoast with old-value logging.', 'crayn-ai-builder-mcp' ),
 			)
 		);
 		wp_register_ability_category(
-			'crayn-plugins',
+			'craynai-plugins',
 			array(
-				'label'       => __( 'Crayn: Plugins', 'crayn-safe-mcp' ),
-				'description' => __( 'Safe plugin list/update/activate/rollback with zipped backups and automatic health-check rollback.', 'crayn-safe-mcp' ),
+				'label'       => __( 'Crayn: Plugins', 'crayn-ai-builder-mcp' ),
+				'description' => __( 'Safe plugin list/update/activate/rollback with zipped backups and automatic health-check rollback.', 'crayn-ai-builder-mcp' ),
 			)
 		);
 		wp_register_ability_category(
-			'crayn-site',
+			'craynai-site',
 			array(
-				'label'       => __( 'Crayn: Site', 'crayn-safe-mcp' ),
-				'description' => __( 'Site health and the change log (list and revert) with admin-only permissions.', 'crayn-safe-mcp' ),
+				'label'       => __( 'Crayn: Site', 'crayn-ai-builder-mcp' ),
+				'description' => __( 'Site health and the change log (list and revert) with admin-only permissions.', 'crayn-ai-builder-mcp' ),
 			)
 		);
 		wp_register_ability_category(
-			'crayn-settings',
+			'craynai-settings',
 			array(
-				'label'       => __( 'Site settings and menus', 'crayn-safe-mcp' ),
-				'description' => __( 'Allow-listed site settings and navigation menus with preview, logging and revert.', 'crayn-safe-mcp' ),
+				'label'       => __( 'Site settings and menus', 'crayn-ai-builder-mcp' ),
+				'description' => __( 'Allow-listed site settings and navigation menus with preview, logging and revert.', 'crayn-ai-builder-mcp' ),
 			)
 		);
 	}
@@ -153,7 +153,7 @@ class Plugin {
 	}
 
 	/**
-	 * Create the custom MCP server that lists every Crayn Safe ability as a direct tool.
+	 * Create the custom MCP server that lists every CraynAI ability as a direct tool.
 	 *
 	 * @param \WP\MCP\Core\McpAdapter $adapter Adapter instance.
 	 * @return void
@@ -174,7 +174,7 @@ class Plugin {
 			) as $category => $class
 		) {
 			if ( Settings::category_enabled( $category ) ) {
-				$names = array_merge( $names, call_user_func( array( 'CraynSafeMcp\\' . $class, 'ability_names' ) ) );
+				$names = array_merge( $names, call_user_func( array( 'CraynAiBuilderMcp\\' . $class, 'ability_names' ) ) );
 			}
 		}
 
@@ -204,11 +204,11 @@ class Plugin {
 		}
 
 		$adapter->create_server(
-			'crayn-safe',
-			'crayn-safe/v1',
+			'craynai',
+			'craynai/v1',
 			'mcp',
-			__( 'Crayn Safe MCP', 'crayn-safe-mcp' ),
-			__( 'Safe, previewable, revertible WordPress abilities: content, page builders, SEO, plugins, menus, settings and site health. Every write supports dry run, is logged with before/after snapshots and can be reverted.', 'crayn-safe-mcp' ),
+			__( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ),
+			__( 'Safe, previewable, revertible WordPress abilities: content, page builders, SEO, plugins, menus, settings and site health. Every write supports dry run, is logged with before/after snapshots and can be reverted.', 'crayn-ai-builder-mcp' ),
 			'1.0.0',
 			array( \WP\MCP\Transport\HttpTransport::class ),
 			\WP\MCP\Infrastructure\ErrorHandling\ErrorLogMcpErrorHandler::class,

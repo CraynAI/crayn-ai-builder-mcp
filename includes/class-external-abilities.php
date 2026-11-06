@@ -3,16 +3,16 @@
  * Safe exposure of third-party SEO plugin abilities (Rank Math and Yoast SEO).
  *
  * - Read-only abilities (annotations.readonly = true) are exposed directly on the MCP server.
- * - Everything else is NOT exposed raw: a wrapper ability "crayn-safe/ext-<name>" honours read-only
+ * - Everything else is NOT exposed raw: a wrapper ability "craynai/ext-<name>" honours read-only
  *   mode and dry_run, snapshots the plugin's options before running the original ability,
  *   logs the before/after option state and can be reverted with change-revert.
  * - While the setting is on, the original writing abilities are also hidden from the MCP
  *   adapter's default server (meta.mcp.public = false) so they cannot be reached without the wrapper.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,7 +68,7 @@ class ExternalAbilities {
 	 */
 	public static function wrapper_name( $name ) {
 		$slug = preg_replace( '/[^a-z0-9-]+/', '-', strtolower( str_replace( '/', '-', $name ) ) );
-		return 'crayn-safe/ext-' . trim( $slug, '-' );
+		return 'craynai/ext-' . trim( $slug, '-' );
 	}
 
 	/**
@@ -171,7 +171,7 @@ class ExternalAbilities {
 	 * @return array<string, array{exists: bool, value: mixed}>
 	 */
 	public static function snapshot_options( array $names ) {
-		$missing = '__crayn_safe_missing__';
+		$missing = '__craynai_missing__';
 		$snap    = array();
 		foreach ( $names as $option ) {
 			$value          = get_option( $option, $missing );
@@ -227,8 +227,8 @@ class ExternalAbilities {
 			self::wrapper_name( $name ),
 			array(
 				'label'               => 'Safe: ' . $orig->get_label(),
-				'description'         => $orig->get_description() . ' [Crayn Safe wrapper: supports dry_run, honours read-only mode, snapshots the plugin options first, logs the change and can be reverted with change-revert.]',
-				'category'            => 'crayn-seo',
+				'description'         => $orig->get_description() . ' [CraynAI wrapper: supports dry_run, honours read-only mode, snapshots the plugin options first, logs the change and can be reverted with change-revert.]',
+				'category'            => 'craynai-seo',
 				'input_schema'        => $input_schema,
 				'output_schema'       => array(
 					'type'       => 'object',
@@ -259,7 +259,7 @@ class ExternalAbilities {
 	 * @return bool
 	 */
 	public static function permission( $name, $input ) {
-		if ( ! current_user_can( 'manage_options' ) || null !== Safety::guard( 'crayn-seo', false ) ) {
+		if ( ! current_user_can( 'manage_options' ) || null !== Safety::guard( 'craynai-seo', false ) ) {
 			return false;
 		}
 		$orig = wp_get_ability( $name );
@@ -283,13 +283,13 @@ class ExternalAbilities {
 		$dry_run = Safety::dry_run( $input );
 		unset( $input['dry_run'] );
 
-		$guard = Safety::guard( 'crayn-seo', true, $dry_run );
+		$guard = Safety::guard( 'craynai-seo', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		$orig = wp_get_ability( $name );
 		if ( ! $orig ) {
-			return new \WP_Error( 'crayn_safe_ability_missing', sprintf( 'The wrapped ability "%s" is no longer registered.', $name ) );
+			return new \WP_Error( 'craynai_ability_missing', sprintf( 'The wrapped ability "%s" is no longer registered.', $name ) );
 		}
 
 		$names  = self::option_names( $name );
@@ -315,7 +315,7 @@ class ExternalAbilities {
 		$changed = self::changed_options( $before, $after );
 
 		$change_id = ChangeLogger::log(
-			'crayn-safe/ext-' . substr( self::wrapper_name( $name ), strlen( 'crayn-safe/ext-' ) ),
+			'craynai/ext-' . substr( self::wrapper_name( $name ), strlen( 'craynai/ext-' ) ),
 			'options',
 			0,
 			array(
@@ -368,7 +368,7 @@ class ExternalAbilities {
 	 */
 	public static function revert( array $before, array $after ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Reverting option changes requires manage_options.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Reverting option changes requires manage_options.' );
 		}
 		$allowed = isset( $before['original'] ) ? self::option_names( (string) $before['original'] ) : array();
 		$options = isset( $before['options'] ) && is_array( $before['options'] ) ? $before['options'] : array();

@@ -9,15 +9,15 @@
  * post_content and the WPBakery custom CSS metas in before/after) and can
  * be reverted through WpbakeryAbilities::revert().
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the "crayn-content" WPBakery abilities.
+ * Registers the "craynai-content" WPBakery abilities.
  */
 class WpbakeryAbilities extends AbilitiesBase {
 
@@ -35,15 +35,15 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/wpbakery-elements',
-			'crayn-safe/wpbakery-get',
-			'crayn-safe/wpbakery-add',
-			'crayn-safe/wpbakery-update',
-			'crayn-safe/wpbakery-move',
-			'crayn-safe/wpbakery-remove',
-			'crayn-safe/wpbakery-replace',
-			'crayn-safe/wpbakery-enable',
-			'crayn-safe/wpbakery-page-css',
+			'craynai/wpbakery-elements',
+			'craynai/wpbakery-get',
+			'craynai/wpbakery-add',
+			'craynai/wpbakery-update',
+			'craynai/wpbakery-move',
+			'craynai/wpbakery-remove',
+			'craynai/wpbakery-replace',
+			'craynai/wpbakery-enable',
+			'craynai/wpbakery-page-css',
 		);
 	}
 
@@ -113,17 +113,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-elements
+	 * craynai/wpbakery-elements
 	 *
 	 * @return void
 	 */
 	private static function register_elements() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-elements',
+			'craynai/wpbakery-elements',
 			array(
 				'label'              => 'List WPBakery elements',
 				'description'        => 'List available WPBakery elements with container flags and placement rules. Params are only included with "base" (one element in full: param_name, type, heading, options, default), which keeps the list small. Use "search"/"category" to filter.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -173,17 +173,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-get
+	 * craynai/wpbakery-get
 	 *
 	 * @return void
 	 */
 	private static function register_get() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-get',
+			'craynai/wpbakery-get',
 			array(
 				'label'              => 'Get WPBakery page',
 				'description'        => 'Get a page built with WPBakery: uses_wpbakery flag, outline (path/tag/preview lines per element), the full shortcode tree as JSON with decoded attribute values (extra "link" and "decoded" keys show parsed links, raw HTML and param groups) and the WPBakery custom CSS values. The tree can be sent back to wpbakery-replace.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -217,17 +217,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-add
+	 * craynai/wpbakery-add
 	 *
 	 * @return void
 	 */
 	private static function register_add() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-add',
+			'craynai/wpbakery-add',
 			array(
 				'label'              => 'Add WPBakery element',
 				'description'        => 'Add an element (optionally with pre-built children) into a WPBakery page at a path. parent_path [] = top level; index omitted = append. Validates the element exists in WPBakery and its placement (rows/columns/sections). Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -253,17 +253,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-update
+	 * craynai/wpbakery-update
 	 *
 	 * @return void
 	 */
 	private static function register_update() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-update',
+			'craynai/wpbakery-update',
 			array(
 				'label'              => 'Update WPBakery element',
 				'description'        => 'Update the element at a path in a WPBakery page: merge attrs, remove attrs and/or replace its content. Only given fields change. Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -286,17 +286,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-move
+	 * craynai/wpbakery-move
 	 *
 	 * @return void
 	 */
 	private static function register_move() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-move',
+			'craynai/wpbakery-move',
 			array(
 				'label'              => 'Move WPBakery element',
 				'description'        => 'Move a subtree to another parent path (or top level) at an optional position. Moving into the moved subtree itself is rejected and WPBakery placement rules apply. Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -317,17 +317,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-remove
+	 * craynai/wpbakery-remove
 	 *
 	 * @return void
 	 */
 	private static function register_remove() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-remove',
+			'craynai/wpbakery-remove',
 			array(
 				'label'              => 'Remove WPBakery element',
 				'description'        => 'Remove the element (and its children) at a path from a WPBakery page. Nothing is hard deleted: the whole previous content stays in the change log and is fully restorable. Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -346,17 +346,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-replace
+	 * craynai/wpbakery-replace
 	 *
 	 * @return void
 	 */
 	private static function register_replace() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-replace',
+			'craynai/wpbakery-replace',
 			array(
 				'label'              => 'Replace WPBakery content',
 				'description'        => 'Replace the complete WPBakery shortcode content of a page in one call: pass either "content" (full shortcode string as stored) or "tree" (the full node list, e.g. from wpbakery-get tree). Use for bulk rewrites; per-element edits are better with add/update/move/remove. Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -377,17 +377,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-enable
+	 * craynai/wpbakery-enable
 	 *
 	 * @return void
 	 */
 	private static function register_enable() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-enable',
+			'craynai/wpbakery-enable',
 			array(
 				'label'              => 'Enable WPBakery editor for a page',
 				'description'        => "Set the post meta _wpb_vc_js_status to 'true' so the backend/frontend editor opens the page in WPBakery mode. Logged with change_id.",
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -405,17 +405,17 @@ class WpbakeryAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/wpbakery-page-css
+	 * craynai/wpbakery-page-css
 	 *
 	 * @return void
 	 */
 	private static function register_page_css() {
 		wp_register_ability(
-			'crayn-safe/wpbakery-page-css',
+			'craynai/wpbakery-page-css',
 			array(
 				'label'              => 'Set WPBakery page CSS',
 				'description'        => 'Set the custom CSS of a WPBakery page (meta _wpb_post_custom_css, exactly what the WPBakery editor writes). An empty "css" string clears the CSS. "</style" sequences are stripped so the value cannot break out of the <style> block it is shown in. Accepts dry_run; logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -457,7 +457,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		}
 		$post_id = ( is_array( $input ) && isset( $input['post_id'] ) ) ? (int) $input['post_id'] : 0;
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-content', false );
+		return $can && null === Safety::guard( 'craynai-content', false );
 	}
 
 	/**
@@ -481,7 +481,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_wpbakery_elements( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -492,7 +492,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		$base = isset( $input['base'] ) ? (string) $input['base'] : '';
 		if ( '' !== $base ) {
 			if ( ! isset( $catalog[ $base ] ) ) {
-				return new \WP_Error( 'crayn_safe_element_unknown', sprintf( 'WPBakery element "%s" is not registered.', $base ) );
+				return new \WP_Error( 'craynai_element_unknown', sprintf( 'WPBakery element "%s" is not registered.', $base ) );
 			}
 			$items[] = self::element_item( $base, $catalog[ $base ], true );
 			return array( 'total' => 1, 'items' => $items );
@@ -525,7 +525,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_wpbakery_get( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -556,7 +556,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_add( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -566,7 +566,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 			return $post;
 		}
 		if ( ! isset( $input['element'] ) || ! is_array( $input['element'] ) ) {
-			return new \WP_Error( 'crayn_safe_element_required', 'The "element" input is required.' );
+			return new \WP_Error( 'craynai_element_required', 'The "element" input is required.' );
 		}
 
 		$tree = ShortcodeTree::parse( (string) $post->post_content );
@@ -577,7 +577,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$parent_path = self::int_path( isset( $input['parent_path'] ) && is_array( $input['parent_path'] ) ? $input['parent_path'] : array() );
 		if ( null === $parent_path ) {
-			return new \WP_Error( 'crayn_safe_path_invalid', 'parent_path must be an array of non-negative integers.' );
+			return new \WP_Error( 'craynai_path_invalid', 'parent_path must be an array of non-negative integers.' );
 		}
 		$placement   = self::check_placement( $node, $tree, $parent_path, true );
 		if ( is_wp_error( $placement ) ) {
@@ -587,10 +587,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 		$index = isset( $input['index'] ) ? (int) $input['index'] : null;
 		$new   = ShortcodeTree::insert_node( $tree, $parent_path, $index, $node );
 		if ( null === $new ) {
-			return new \WP_Error( 'crayn_safe_path_not_found', 'The parent_path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
+			return new \WP_Error( 'craynai_path_not_found', 'The parent_path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
 		}
 
-		return self::apply_tree( $post, $new, 'crayn-safe/wpbakery-add', 'element added at path ' . self::path_str( $parent_path ) . ( null !== $index ? ':' . $index : ':append' ), $dry );
+		return self::apply_tree( $post, $new, 'craynai/wpbakery-add', 'element added at path ' . self::path_str( $parent_path ) . ( null !== $index ? ':' . $index : ':append' ), $dry );
 	}
 
 	/**
@@ -601,7 +601,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_update( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -613,10 +613,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$path = self::int_path( isset( $input['path'] ) && is_array( $input['path'] ) ? $input['path'] : array() );
 		if ( null === $path ) {
-			return new \WP_Error( 'crayn_safe_path_invalid', 'path must be an array of non-negative integers.' );
+			return new \WP_Error( 'craynai_path_invalid', 'path must be an array of non-negative integers.' );
 		}
 		if ( array() === $path ) {
-			return new \WP_Error( 'crayn_safe_path_required', 'A non-empty "path" is required (the whole page can be replaced with wpbakery-replace).' );
+			return new \WP_Error( 'craynai_path_required', 'A non-empty "path" is required (the whole page can be replaced with wpbakery-replace).' );
 		}
 
 		$tree       = ShortcodeTree::parse( (string) $post->post_content );
@@ -633,10 +633,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$new = ShortcodeTree::update_node( $tree, $path, $merged, $content, $remove );
 		if ( null === $new ) {
-			return new \WP_Error( 'crayn_safe_path_not_found', 'The path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
+			return new \WP_Error( 'craynai_path_not_found', 'The path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
 		}
 
-		return self::apply_tree( $post, $new, 'crayn-safe/wpbakery-update', 'element updated at path ' . self::path_str( $path ), $dry );
+		return self::apply_tree( $post, $new, 'craynai/wpbakery-update', 'element updated at path ' . self::path_str( $path ), $dry );
 	}
 
 	/**
@@ -647,7 +647,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_move( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -660,10 +660,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 		$from_path = self::int_path( isset( $input['from_path'] ) && is_array( $input['from_path'] ) ? $input['from_path'] : array() );
 		$to_path   = self::int_path( isset( $input['to_parent_path'] ) && is_array( $input['to_parent_path'] ) ? $input['to_parent_path'] : array() );
 		if ( null === $from_path || null === $to_path ) {
-			return new \WP_Error( 'crayn_safe_path_invalid', 'from_path/to_parent_path must be arrays of non-negative integers.' );
+			return new \WP_Error( 'craynai_path_invalid', 'from_path/to_parent_path must be arrays of non-negative integers.' );
 		}
 		if ( array() === $from_path ) {
-			return new \WP_Error( 'crayn_safe_path_required', 'A non-empty "from_path" is required.' );
+			return new \WP_Error( 'craynai_path_required', 'A non-empty "from_path" is required.' );
 		}
 		$index = isset( $input['index'] ) ? (int) $input['index'] : null;
 
@@ -677,10 +677,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 		}
 		$new = ShortcodeTree::move_node( $tree, $from_path, $to_path, $index );
 		if ( null === $new ) {
-			return new \WP_Error( 'crayn_safe_move_failed', 'The move failed: from_path/to_parent_path must point to existing elements and the target must not be inside the moved subtree. Re-run wpbakery-get for current paths.' );
+			return new \WP_Error( 'craynai_move_failed', 'The move failed: from_path/to_parent_path must point to existing elements and the target must not be inside the moved subtree. Re-run wpbakery-get for current paths.' );
 		}
 
-		return self::apply_tree( $post, $new, 'crayn-safe/wpbakery-move', 'element moved from ' . self::path_str( $from_path ) . ' to parent ' . self::path_str( $to_path ), $dry );
+		return self::apply_tree( $post, $new, 'craynai/wpbakery-move', 'element moved from ' . self::path_str( $from_path ) . ' to parent ' . self::path_str( $to_path ), $dry );
 	}
 
 	/**
@@ -691,7 +691,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_remove( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -703,19 +703,19 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$path = self::int_path( isset( $input['path'] ) && is_array( $input['path'] ) ? $input['path'] : array() );
 		if ( null === $path ) {
-			return new \WP_Error( 'crayn_safe_path_invalid', 'path must be an array of non-negative integers.' );
+			return new \WP_Error( 'craynai_path_invalid', 'path must be an array of non-negative integers.' );
 		}
 		if ( array() === $path ) {
-			return new \WP_Error( 'crayn_safe_path_required', 'A non-empty "path" is required.' );
+			return new \WP_Error( 'craynai_path_required', 'A non-empty "path" is required.' );
 		}
 
 		$tree = ShortcodeTree::parse( (string) $post->post_content );
 		$new  = ShortcodeTree::remove_node( $tree, $path );
 		if ( null === $new ) {
-			return new \WP_Error( 'crayn_safe_path_not_found', 'The path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
+			return new \WP_Error( 'craynai_path_not_found', 'The path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
 		}
 
-		return self::apply_tree( $post, $new, 'crayn-safe/wpbakery-remove', 'element removed at path ' . self::path_str( $path ), $dry );
+		return self::apply_tree( $post, $new, 'craynai/wpbakery-remove', 'element removed at path ' . self::path_str( $path ), $dry );
 	}
 
 	/**
@@ -726,7 +726,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_replace( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -750,23 +750,23 @@ class WpbakeryAbilities extends AbilitiesBase {
 			$existing = ShortcodeTree::collect_tags( ShortcodeTree::parse( (string) $post->post_content ) );
 			foreach ( ShortcodeTree::collect_tags( $prepared ) as $tag ) {
 				if ( ! in_array( $tag, $existing, true ) && null === self::wpb_map_entry( $tag ) && ! shortcode_exists( $tag ) ) {
-					return new \WP_Error( 'crayn_safe_element_unknown', sprintf( 'Element "%s" is not registered on this site.', $tag ) );
+					return new \WP_Error( 'craynai_element_unknown', sprintf( 'Element "%s" is not registered on this site.', $tag ) );
 				}
 			}
 			$new = $prepared;
 		} else {
 			// Full shortcode content: parse it (values already encoded).
 			if ( '' === trim( $content ) ) {
-				return new \WP_Error( 'crayn_safe_content_required', 'Provide either "content" (full shortcode string) or "tree" (full node list).' );
+				return new \WP_Error( 'craynai_content_required', 'Provide either "content" (full shortcode string) or "tree" (full node list).' );
 			}
 			$parsed = ShortcodeTree::parse( $content );
 			if ( ! is_array( $parsed ) ) {
-				return new \WP_Error( 'crayn_safe_content_invalid', 'The provided shortcode content could not be parsed.' );
+				return new \WP_Error( 'craynai_content_invalid', 'The provided shortcode content could not be parsed.' );
 			}
 			$new = $parsed;
 		}
 
-		return self::apply_tree( $post, $new, 'crayn-safe/wpbakery-replace', 'full content replaced', $dry );
+		return self::apply_tree( $post, $new, 'craynai/wpbakery-replace', 'full content replaced', $dry );
 	}
 
 	/**
@@ -777,7 +777,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_enable( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -815,7 +815,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		}
 
 		update_post_meta( $post->ID, '_wpb_vc_js_status', 'true' );
-		$change_id = ChangeLogger::log( 'crayn-safe/wpbakery-enable', 'post', $post->ID, $before, self::wpb_snapshot( $post->ID ), 'WPBakery editor enabled (_wpb_vc_js_status = true)' );
+		$change_id = ChangeLogger::log( 'craynai/wpbakery-enable', 'post', $post->ID, $before, self::wpb_snapshot( $post->ID ), 'WPBakery editor enabled (_wpb_vc_js_status = true)' );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'WPBakery editor was enabled for post %d.', $post->ID ) );
 		}
@@ -839,7 +839,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	public static function execute_wpbakery_page_css( $input ) {
 		$dry = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -894,11 +894,11 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$new_snapshot = self::wpb_snapshot( $post->ID );
 		if ( (string) $new_snapshot['wpb_post_css'] !== $css ) {
-			return new \WP_Error( 'crayn_safe_css_write_failed', sprintf( 'The custom CSS of post %d could not be written.', (int) $post->ID ) );
+			return new \WP_Error( 'craynai_css_write_failed', sprintf( 'The custom CSS of post %d could not be written.', (int) $post->ID ) );
 		}
 
 		$change_id = ChangeLogger::log(
-			'crayn-safe/wpbakery-page-css',
+			'craynai/wpbakery-page-css',
 			'post',
 			(int) $post->ID,
 			$before,
@@ -981,14 +981,14 @@ class WpbakeryAbilities extends AbilitiesBase {
 	private static function get_editable_post( $post_id ) {
 		$post_id = (int) $post_id;
 		if ( $post_id <= 0 ) {
-			return new \WP_Error( 'crayn_safe_post_id_required', 'A valid post_id is required.' );
+			return new \WP_Error( 'craynai_post_id_required', 'A valid post_id is required.' );
 		}
 		$post = get_post( $post_id );
 		if ( ! $post instanceof \WP_Post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this content.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this content.' );
 		}
 		return $post;
 	}
@@ -1172,7 +1172,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		// Names are written unescaped: a bracket in one would add a shortcode to the page.
 		$invalid = ShortcodeTree::find_invalid_name( $tree );
 		if ( null !== $invalid ) {
-			return new \WP_Error( 'crayn_safe_attr_invalid', sprintf( 'Invalid name in the shortcode tree: %s.', $invalid ) );
+			return new \WP_Error( 'craynai_attr_invalid', sprintf( 'Invalid name in the shortcode tree: %s.', $invalid ) );
 		}
 
 		$denied = self::raw_html_error( $tree, ShortcodeTree::parse( (string) $post->post_content ) );
@@ -1182,7 +1182,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$content = ShortcodeTree::serialize( $tree );
 		if ( ! is_string( $content ) ) {
-			return new \WP_Error( 'crayn_safe_serialize_failed', 'The shortcode tree could not be serialized.' );
+			return new \WP_Error( 'craynai_serialize_failed', 'The shortcode tree could not be serialized.' );
 		}
 
 		$before         = self::wpb_snapshot( $post->ID );
@@ -1216,7 +1216,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$updated = wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ), true );
 		if ( is_wp_error( $updated ) ) {
-			return new \WP_Error( 'crayn_safe_post_update_failed', sprintf( 'Saving post %d failed: %s', (int) $post->ID, implode( ' ', $updated->get_error_messages() ) ) );
+			return new \WP_Error( 'craynai_post_update_failed', sprintf( 'Saving post %d failed: %s', (int) $post->ID, implode( ' ', $updated->get_error_messages() ) ) );
 		}
 
 		self::rebuild_css( (int) $post->ID, $content );
@@ -1415,7 +1415,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	private static function prepare_node( $element, $encoded ) {
 		if ( ! is_array( $element ) || ! isset( $element['tag'] ) || ! is_string( $element['tag'] ) || '' === trim( $element['tag'] ) ) {
-			return new \WP_Error( 'crayn_safe_element_invalid', 'Every element needs a "tag" string.' );
+			return new \WP_Error( 'craynai_element_invalid', 'Every element needs a "tag" string.' );
 		}
 		$tag     = trim( (string) $element['tag'] );
 		// New elements get an explicit closing tag: a bare tag followed later by a same-name
@@ -1475,12 +1475,12 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	private static function prepare_nodes( $input, $encoded ) {
 		if ( ! is_array( $input ) ) {
-			return new \WP_Error( 'crayn_safe_tree_invalid', 'The tree must be a list of node objects.' );
+			return new \WP_Error( 'craynai_tree_invalid', 'The tree must be a list of node objects.' );
 		}
 		$out = array();
 		foreach ( array_values( $input ) as $item ) {
 			if ( ! is_array( $item ) ) {
-				return new \WP_Error( 'crayn_safe_tree_invalid', 'The tree must only contain node objects.' );
+				return new \WP_Error( 'craynai_tree_invalid', 'The tree must only contain node objects.' );
 			}
 			$prepared = self::prepare_node( $item, $encoded );
 			if ( is_wp_error( $prepared ) ) {
@@ -1575,7 +1575,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 	 */
 	private static function check_pair( $tag, $parent_tag ) {
 		$denied = function ( $message ) {
-			return new \WP_Error( 'crayn_safe_placement_denied', $message );
+			return new \WP_Error( 'craynai_placement_denied', $message );
 		};
 
 		if ( ShortcodeTree::TEXT_TAG === $tag ) {
@@ -1587,11 +1587,11 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		$entry = self::wpb_map_entry( $tag );
 		if ( null === $entry ) {
-			return new \WP_Error( 'crayn_safe_element_unknown', sprintf( 'Element "%s" is not registered in WPBakery on this site.', $tag ) );
+			return new \WP_Error( 'craynai_element_unknown', sprintf( 'Element "%s" is not registered in WPBakery on this site.', $tag ) );
 		}
 
 		if ( null === $parent_tag ) {
-			$root_tags = apply_filters( 'crayn_safe_wpbakery_root_tags', array( 'vc_row', 'vc_section', 'vc_grid_container', 'vc_flexbox_container' ) );
+			$root_tags = apply_filters( 'crayn_ai_builder_mcp_wpbakery_root_tags', array( 'vc_row', 'vc_section', 'vc_grid_container', 'vc_flexbox_container' ) );
 			if ( ! in_array( $tag, (array) $root_tags, true ) ) {
 				return $denied( sprintf( '"%s" cannot be placed at the top level of a WPBakery page (allowed: %s).', $tag, implode( ', ', (array) $root_tags ) ) );
 			}
@@ -1650,7 +1650,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		if ( array() !== $parent_path ) {
 			$parent = ShortcodeTree::get_node( $tree, $parent_path );
 			if ( ! is_array( $parent ) ) {
-				return new \WP_Error( 'crayn_safe_path_not_found', 'The parent path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
+				return new \WP_Error( 'craynai_path_not_found', 'The parent path does not point to an element in this page. Re-run wpbakery-get for current paths.' );
 			}
 			$parent_tag = (string) $parent['tag'];
 		}
@@ -1801,7 +1801,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 			$before = ChangeLogger::decode( $row['before_data'] );
 		}
 		if ( empty( $before ) || ! is_array( $before ) || ! array_key_exists( 'post_content', $before ) ) {
-			return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no WPBakery snapshot to restore.' );
+			return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no WPBakery snapshot to restore.' );
 		}
 
 		$post_id = isset( $row['object_id'] ) ? (int) $row['object_id'] : 0;
@@ -1809,10 +1809,10 @@ class WpbakeryAbilities extends AbilitiesBase {
 			$post_id = (int) $before['ID'];
 		}
 		if ( $post_id <= 0 || ! get_post( $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist anymore; nothing to restore.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist anymore; nothing to restore.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this content.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this content.' );
 		}
 
 		$ability = isset( $row['ability'] ) ? (string) $row['ability'] : '';
@@ -1821,15 +1821,15 @@ class WpbakeryAbilities extends AbilitiesBase {
 
 		// Each tool restores only what it can change: the enable flag, the page CSS,
 		// or the content with its generated CSS. Later edits of the others stay.
-		if ( 'crayn-safe/wpbakery-page-css' === $ability ) {
+		if ( 'craynai/wpbakery-page-css' === $ability ) {
 			if ( is_array( $after ) && isset( $after['wpb_post_css'] ) && (string) get_post_meta( $post_id, '_wpb_post_custom_css', true ) !== (string) $after['wpb_post_css'] ) {
-				return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'The page CSS of post %d changed after this edit. Revert the newer changes first (see changes-list), newest first.', $post_id ) );
+				return new \WP_Error( 'craynai_revert_conflict', sprintf( 'The page CSS of post %d changed after this edit. Revert the newer changes first (see changes-list), newest first.', $post_id ) );
 			}
 			$metas = array( 'wpb_post_css' => '_wpb_post_custom_css' );
-		} elseif ( 'crayn-safe/wpbakery-enable' !== $ability ) {
+		} elseif ( 'craynai/wpbakery-enable' !== $ability ) {
 			// The snapshot replaces the whole page: never overwrite later edits silently.
 			if ( is_array( $after ) && isset( $after['post_content'] ) && (string) get_post_field( 'post_content', $post_id, 'raw' ) !== (string) $after['post_content'] ) {
-				return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'The content of post %d changed after this edit. Revert the newer changes first (see changes-list), newest first.', $post_id ) );
+				return new \WP_Error( 'craynai_revert_conflict', sprintf( 'The content of post %d changed after this edit. Revert the newer changes first (see changes-list), newest first.', $post_id ) );
 			}
 			$updated = wp_update_post( wp_slash( array( 'ID' => $post_id, 'post_content' => (string) $before['post_content'] ) ), true );
 			if ( is_wp_error( $updated ) ) {
@@ -1875,7 +1875,7 @@ class WpbakeryAbilities extends AbilitiesBase {
 		$existing = self::raw_elements( $old );
 		foreach ( self::raw_elements( $new ) as $element ) {
 			if ( ! in_array( $element, $existing, true ) ) {
-				return new \WP_Error( 'crayn_safe_raw_html_denied', 'Adding or changing raw HTML or JS elements requires the unfiltered_html capability.' );
+				return new \WP_Error( 'craynai_raw_html_denied', 'Adding or changing raw HTML or JS elements requires the unfiltered_html capability.' );
 			}
 		}
 		return null;

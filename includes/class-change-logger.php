@@ -1,16 +1,16 @@
 <?php
 /**
- * Change log database table for Crayn Safe MCP.
+ * Change log database table for Crayn AI Builder MCP.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Writes and reads rows from {$wpdb->prefix}crayn_safe_log.
+ * Writes and reads rows from {$wpdb->prefix}craynai_log.
  *
  * Every non-dry-run write operation stores one row BEFORE returning to the
  * caller. The row holds the before/after JSON snapshots so the write can be
@@ -26,7 +26,7 @@ class ChangeLogger {
 	public static function activate() {
 		global $wpdb;
 
-		$table           = $wpdb->prefix . 'crayn_safe_log';
+		$table           = $wpdb->prefix . 'craynai_log';
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$table} (
@@ -49,7 +49,7 @@ class ChangeLogger {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
-		add_option( 'crayn_safe_mcp_settings', Settings::defaults(), '', false );
+		add_option( 'crayn_ai_builder_mcp_settings', Settings::defaults(), '', false );
 	}
 
 	/**
@@ -68,7 +68,7 @@ class ChangeLogger {
 		}
 		$checked = true;
 
-		$table = $wpdb->prefix . 'crayn_safe_log';
+		$table = $wpdb->prefix . 'craynai_log';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) !== $table ) {
 			self::activate();
@@ -83,7 +83,7 @@ class ChangeLogger {
 	 */
 	public static function unlogged_error( $what = '' ) {
 		return new \WP_Error(
-			'crayn_safe_change_not_logged',
+			'craynai_change_not_logged',
 			trim( 'The change was applied but could not be written to the change log, so it cannot be reverted with change-revert. ' . $what )
 		);
 	}
@@ -91,7 +91,7 @@ class ChangeLogger {
 	/**
 	 * Insert a change row. Returns the change id, or 0 on failure.
 	 *
-	 * @param string     $ability     Ability name, e.g. "crayn-safe/post-update".
+	 * @param string     $ability     Ability name, e.g. "craynai/post-update".
 	 * @param string     $object_type Object type: post|seo|term|attachment|plugin.
 	 * @param int|string $object_id   Object id (0 or slug-ish string when not applicable).
 	 * @param array|null $before      Before snapshot.
@@ -105,7 +105,7 @@ class ChangeLogger {
 		self::ensure_table();
 
 		$inserted = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Plugin's own change log table, has no WP API; all values are inserted via the $wpdb->insert() format array.
-			$wpdb->prefix . 'crayn_safe_log',
+			$wpdb->prefix . 'craynai_log',
 			array(
 				'created_at'  => current_time( 'mysql', true ),
 				'user_id'     => get_current_user_id(),
@@ -134,7 +134,7 @@ class ChangeLogger {
 
 		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin's own change log row fetched once for a revert; caching it would serve stale data right after concurrent writes.
 			$wpdb->prepare(
-				'SELECT * FROM ' . $wpdb->prefix . 'crayn_safe_log WHERE id = %d',
+				'SELECT * FROM ' . $wpdb->prefix . 'craynai_log WHERE id = %d',
 				$change_id
 			),
 			ARRAY_A
@@ -153,7 +153,7 @@ class ChangeLogger {
 		global $wpdb;
 
 		$limit    = isset( $filters['limit'] ) ? max( 1, min( 100, (int) $filters['limit'] ) ) : 20;
-		$table    = $wpdb->prefix . 'crayn_safe_log';
+		$table    = $wpdb->prefix . 'craynai_log';
 		$where    = array( '1=1' );
 		$prepare  = array();
 
@@ -195,7 +195,7 @@ class ChangeLogger {
 
 		$updated = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Atomic "revert claim" on the plugin's own table; caching would defeat its purpose.
 			$wpdb->prepare(
-				'UPDATE ' . $wpdb->prefix . 'crayn_safe_log SET reverted_at = %s WHERE id = %d AND reverted_at IS NULL',
+				'UPDATE ' . $wpdb->prefix . 'craynai_log SET reverted_at = %s WHERE id = %d AND reverted_at IS NULL',
 				current_time( 'mysql', true ),
 				$change_id
 			)
@@ -214,7 +214,7 @@ class ChangeLogger {
 		global $wpdb;
 
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( 'UPDATE ' . $wpdb->prefix . 'crayn_safe_log SET reverted_at = NULL WHERE id = %d', $change_id )
+			$wpdb->prepare( 'UPDATE ' . $wpdb->prefix . 'craynai_log SET reverted_at = NULL WHERE id = %d', $change_id )
 		);
 	}
 

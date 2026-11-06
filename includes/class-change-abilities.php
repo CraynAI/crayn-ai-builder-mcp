@@ -2,15 +2,15 @@
 /**
  * Change log abilities: list changes and safely revert them.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Register "crayn-safe/changes-list" and "crayn-safe/change-revert".
+ * Register "craynai/changes-list" and "craynai/change-revert".
  *
  * change-revert restores the before_data snapshot depending on the ability:
  * post fields (incl. term assignments and the featured image), SEO meta,
@@ -26,8 +26,8 @@ class ChangeAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/changes-list',
-			'crayn-safe/change-revert',
+			'craynai/changes-list',
+			'craynai/change-revert',
 		);
 	}
 
@@ -42,17 +42,17 @@ class ChangeAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/changes-list
+	 * craynai/changes-list
 	 *
 	 * @return void
 	 */
 	private static function register_changes_list() {
 		wp_register_ability(
-			'crayn-safe/changes-list',
+			'craynai/changes-list',
 			array(
 				'label'              => 'List changes',
 				'description'        => 'List logged changes (most recent first) with optional object_type/object_id filters. Read only.',
-				'category'           => 'crayn-site',
+				'category'           => 'craynai-site',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -110,7 +110,7 @@ class ChangeAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_changes_list( $input ) {
-		$guard = Safety::guard( 'crayn-site', false );
+		$guard = Safety::guard( 'craynai-site', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -144,17 +144,17 @@ class ChangeAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/change-revert
+	 * craynai/change-revert
 	 *
 	 * @return void
 	 */
 	private static function register_change_revert() {
 		wp_register_ability(
-			'crayn-safe/change-revert',
+			'craynai/change-revert',
 			array(
 				'label'              => 'Revert change',
-				'description'        => 'Revert a logged change by its change id (get ids from changes-list or any write result). Restores the exact before snapshot: post fields, term assignments, SEO meta, plugin activation state, plugin files from the backup zip, WPBakery / Elementor page data, site settings, menus and menu locations. Refuses with crayn_safe_revert_conflict when the object changed after the write. Reverting twice fails cleanly.',
-				'category'           => 'crayn-site',
+				'description'        => 'Revert a logged change by its change id (get ids from changes-list or any write result). Restores the exact before snapshot: post fields, term assignments, SEO meta, plugin activation state, plugin files from the backup zip, WPBakery / Elementor page data, site settings, menus and menu locations. Refuses with craynai_revert_conflict when the object changed after the write. Reverting twice fails cleanly.',
+				'category'           => 'craynai-site',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -199,20 +199,20 @@ class ChangeAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function revert( $change_id ) {
-		$guard = Safety::guard( 'crayn-site', true, false );
+		$guard = Safety::guard( 'craynai-site', true, false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Reverting changes requires the manage_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Reverting changes requires the manage_options capability.' );
 		}
 
 		$row = ChangeLogger::get( $change_id );
 		if ( null === $row ) {
-			return new \WP_Error( 'crayn_safe_change_not_found', sprintf( 'Change %d does not exist.', $change_id ) );
+			return new \WP_Error( 'craynai_change_not_found', sprintf( 'Change %d does not exist.', $change_id ) );
 		}
 		if ( ! empty( $row['reverted_at'] ) ) {
-			return new \WP_Error( 'crayn_safe_already_reverted', sprintf( 'Change %d was already reverted at %s. Reverting twice is not allowed.', $change_id, $row['reverted_at'] ) );
+			return new \WP_Error( 'craynai_already_reverted', sprintf( 'Change %d was already reverted at %s. Reverting twice is not allowed.', $change_id, $row['reverted_at'] ) );
 		}
 
 		$before  = ChangeLogger::decode( $row['before_data'] );
@@ -221,62 +221,62 @@ class ChangeAbilities extends AbilitiesBase {
 		$obj_id  = (int) $row['object_id'];
 
 		$supported = array(
-			'crayn-safe/post-update',
-			'crayn-safe/post-trash',
-			'crayn-safe/post-create',
-			'crayn-safe/seo-update',
-			'crayn-safe/plugin-update',
-			'crayn-safe/plugin-activate',
-			'crayn-safe/plugin-deactivate',
+			'craynai/post-update',
+			'craynai/post-trash',
+			'craynai/post-create',
+			'craynai/seo-update',
+			'craynai/plugin-update',
+			'craynai/plugin-activate',
+			'craynai/plugin-deactivate',
 		);
 		$supported = array_merge(
 			$supported,
 			array(
-				'crayn-safe/rankmath-update',
-				'crayn-safe/rankmath-schema-set',
-				'crayn-safe/rankmath-schema-delete',
-				'crayn-safe/rankmath-redirect-set',
-				'crayn-safe/wpbakery-add',
-				'crayn-safe/wpbakery-update',
-				'crayn-safe/wpbakery-move',
-				'crayn-safe/wpbakery-remove',
-				'crayn-safe/wpbakery-replace',
-				'crayn-safe/wpbakery-enable',
-				'crayn-safe/wpbakery-page-css',
-				'crayn-safe/elementor-add',
-				'crayn-safe/elementor-update',
-				'crayn-safe/elementor-move',
-				'crayn-safe/elementor-remove',
-				'crayn-safe/elementor-duplicate',
-				'crayn-safe/elementor-replace',
-				'crayn-safe/elementor-page-settings',
-				'crayn-safe/elementor-enable',
-				'crayn-safe/settings-update',
-				'crayn-safe/menu-create',
-				'crayn-safe/menu-update',
-				'crayn-safe/menu-delete',
-				'crayn-safe/menu-item-add',
-				'crayn-safe/menu-item-update',
-				'crayn-safe/menu-item-move',
-				'crayn-safe/menu-item-remove',
-				'crayn-safe/menu-locations-set',
+				'craynai/rankmath-update',
+				'craynai/rankmath-schema-set',
+				'craynai/rankmath-schema-delete',
+				'craynai/rankmath-redirect-set',
+				'craynai/wpbakery-add',
+				'craynai/wpbakery-update',
+				'craynai/wpbakery-move',
+				'craynai/wpbakery-remove',
+				'craynai/wpbakery-replace',
+				'craynai/wpbakery-enable',
+				'craynai/wpbakery-page-css',
+				'craynai/elementor-add',
+				'craynai/elementor-update',
+				'craynai/elementor-move',
+				'craynai/elementor-remove',
+				'craynai/elementor-duplicate',
+				'craynai/elementor-replace',
+				'craynai/elementor-page-settings',
+				'craynai/elementor-enable',
+				'craynai/settings-update',
+				'craynai/menu-create',
+				'craynai/menu-update',
+				'craynai/menu-delete',
+				'craynai/menu-item-add',
+				'craynai/menu-item-update',
+				'craynai/menu-item-move',
+				'craynai/menu-item-remove',
+				'craynai/menu-locations-set',
 			)
 		);
-		$is_ext = 0 === strpos( $ability, 'crayn-safe/ext-' );
+		$is_ext = 0 === strpos( $ability, 'craynai/ext-' );
 		if ( ! $is_ext && ! in_array( $ability, $supported, true ) ) {
 			return new \WP_Error(
-				'crayn_safe_revert_not_supported',
+				'craynai_revert_not_supported',
 				sprintf( 'Changes of type "%s" cannot be reverted automatically. Nothing is ever hard deleted: created terms and imported media stay in place.', $ability )
 			);
 		}
 
 		if ( self::changed_after_write( $ability, $obj_id, $before, $after ) ) {
-			return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'What change %d wrote was changed afterwards. Revert the newer changes first (see changes-list).', $change_id ) );
+			return new \WP_Error( 'craynai_revert_conflict', sprintf( 'What change %d wrote was changed afterwards. Revert the newer changes first (see changes-list).', $change_id ) );
 		}
 
 		// Claim the change atomically first, so a concurrent second revert fails cleanly.
 		if ( ! ChangeLogger::mark_reverted( $change_id ) ) {
-			return new \WP_Error( 'crayn_safe_already_reverted', sprintf( 'Change %d was already reverted. Reverting twice is not allowed.', $change_id ) );
+			return new \WP_Error( 'craynai_already_reverted', sprintf( 'Change %d was already reverted. Reverting twice is not allowed.', $change_id ) );
 		}
 
 		// State right before the revert, for the revert's own log row.
@@ -284,57 +284,57 @@ class ChangeAbilities extends AbilitiesBase {
 
 		$details = null;
 		switch ( $ability ) {
-			case 'crayn-safe/wpbakery-add':
-			case 'crayn-safe/wpbakery-update':
-			case 'crayn-safe/wpbakery-move':
-			case 'crayn-safe/wpbakery-remove':
-			case 'crayn-safe/wpbakery-replace':
-			case 'crayn-safe/wpbakery-enable':
-			case 'crayn-safe/wpbakery-page-css':
+			case 'craynai/wpbakery-add':
+			case 'craynai/wpbakery-update':
+			case 'craynai/wpbakery-move':
+			case 'craynai/wpbakery-remove':
+			case 'craynai/wpbakery-replace':
+			case 'craynai/wpbakery-enable':
+			case 'craynai/wpbakery-page-css':
 				$result = WpbakeryAbilities::revert( $row );
 				break;
-			case 'crayn-safe/elementor-add':
-			case 'crayn-safe/elementor-update':
-			case 'crayn-safe/elementor-move':
-			case 'crayn-safe/elementor-remove':
-			case 'crayn-safe/elementor-duplicate':
-			case 'crayn-safe/elementor-replace':
-			case 'crayn-safe/elementor-page-settings':
-			case 'crayn-safe/elementor-enable':
+			case 'craynai/elementor-add':
+			case 'craynai/elementor-update':
+			case 'craynai/elementor-move':
+			case 'craynai/elementor-remove':
+			case 'craynai/elementor-duplicate':
+			case 'craynai/elementor-replace':
+			case 'craynai/elementor-page-settings':
+			case 'craynai/elementor-enable':
 				$result = ElementorAbilities::revert( $row );
 				break;
-			case 'crayn-safe/settings-update':
+			case 'craynai/settings-update':
 				$result = SettingsAbilities::revert( $row );
 				break;
-			case 'crayn-safe/menu-create':
-			case 'crayn-safe/menu-update':
-			case 'crayn-safe/menu-delete':
-			case 'crayn-safe/menu-item-add':
-			case 'crayn-safe/menu-item-update':
-			case 'crayn-safe/menu-item-move':
-			case 'crayn-safe/menu-item-remove':
-			case 'crayn-safe/menu-locations-set':
+			case 'craynai/menu-create':
+			case 'craynai/menu-update':
+			case 'craynai/menu-delete':
+			case 'craynai/menu-item-add':
+			case 'craynai/menu-item-update':
+			case 'craynai/menu-item-move':
+			case 'craynai/menu-item-remove':
+			case 'craynai/menu-locations-set':
 				$result = MenuAbilities::revert( $row );
 				break;
-			case 'crayn-safe/post-update':
+			case 'craynai/post-update':
 				$result = self::restore_post_snapshot( $obj_id, $before, $after );
 				break;
-			case 'crayn-safe/post-trash':
+			case 'craynai/post-trash':
 				$result = self::untrash_post( $obj_id, $before );
 				break;
-			case 'crayn-safe/post-create':
+			case 'craynai/post-create':
 				$result = self::trash_created_post( $obj_id );
 				break;
-			case 'crayn-safe/seo-update':
+			case 'craynai/seo-update':
 				$result = SeoAbilities::restore_snapshot( $obj_id, $before );
 				if ( ! is_wp_error( $result ) ) {
 					$result = sprintf( 'SEO fields of post %d restored.', $obj_id );
 				}
 				break;
-			case 'crayn-safe/plugin-update':
+			case 'craynai/plugin-update':
 				$backup_file = isset( $after['backup_file'] ) ? (string) $after['backup_file'] : '';
 				if ( '' === $backup_file ) {
-					$result = new \WP_Error( 'crayn_safe_no_backup_in_log', 'The change log has no backup file for this plugin update; cannot revert.' );
+					$result = new \WP_Error( 'craynai_no_backup_in_log', 'The change log has no backup file for this plugin update; cannot revert.' );
 					break;
 				}
 				$result = PluginBackup::restore( $backup_file, true );
@@ -342,21 +342,21 @@ class ChangeAbilities extends AbilitiesBase {
 					$result = sprintf( 'Plugin files restored from %s (version %s).', $backup_file, isset( $result['version'] ) ? $result['version'] : '?' );
 				}
 				break;
-			case 'crayn-safe/rankmath-update':
-			case 'crayn-safe/rankmath-schema-set':
-			case 'crayn-safe/rankmath-schema-delete':
+			case 'craynai/rankmath-update':
+			case 'craynai/rankmath-schema-set':
+			case 'craynai/rankmath-schema-delete':
 				$result = RankMathAbilities::revert_change( $before, $after );
 				break;
-			case 'crayn-safe/rankmath-redirect-set':
+			case 'craynai/rankmath-redirect-set':
 				$result = RankMathAbilities::revert_redirect( $obj_id, empty( $before ) ? null : $before, $after );
 				break;
-			case 'crayn-safe/plugin-activate':
+			case 'craynai/plugin-activate':
 				$result = self::set_plugin_state( $before, 'deactivate' );
 				break;
-			case 'crayn-safe/plugin-deactivate':
+			case 'craynai/plugin-deactivate':
 				$result = self::set_plugin_state( $before, 'activate' );
 				break;
-			default: // crayn-safe/ext-* wrapper changes (plugin options).
+			default: // craynai/ext-* wrapper changes (plugin options).
 				$result = ExternalAbilities::revert( $before, $after );
 				break;
 		}
@@ -370,7 +370,7 @@ class ChangeAbilities extends AbilitiesBase {
 
 		// The revert is a logged change of its own.
 		$revert_log_id = ChangeLogger::log(
-			'crayn-safe/change-revert',
+			'craynai/change-revert',
 			(string) $row['object_type'],
 			$obj_id,
 			$pre,
@@ -398,15 +398,15 @@ class ChangeAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	private static function changed_after_write( $ability, $obj_id, array $before, array $after ) {
-		if ( 'crayn-safe/post-update' === $ability ) {
+		if ( 'craynai/post-update' === $ability ) {
 			$fields  = array_flip( array( 'post_title', 'post_content', 'post_excerpt', 'post_status', 'post_name' ) );
 			$before  = array_intersect_key( $before, $fields );
 			$after   = array_intersect_key( $after, $fields );
 			$current = (array) self::post_snapshot( $obj_id );
-		} elseif ( 'crayn-safe/seo-update' === $ability ) {
+		} elseif ( 'craynai/seo-update' === $ability ) {
 			unset( $after['raw'], $after['plugin'], $after['post_id'] );
 			$current = SeoAbilities::seo_snapshot( $obj_id );
-		} elseif ( 'crayn-safe/rankmath-update' === $ability ) {
+		} elseif ( 'craynai/rankmath-update' === $ability ) {
 			$before  = isset( $before['raw'] ) ? (array) $before['raw'] : array();
 			$after   = isset( $after['raw'] ) ? (array) $after['raw'] : array();
 			$current = RankMathAbilities::raw_snapshot( $obj_id );
@@ -432,28 +432,28 @@ class ChangeAbilities extends AbilitiesBase {
 	 * @return array|null
 	 */
 	private static function current_state( $ability, $obj_id, array $before = array() ) {
-		if ( 'crayn-safe/settings-update' === $ability ) {
+		if ( 'craynai/settings-update' === $ability ) {
 			return SettingsAbilities::current_snapshot( array_map( 'strval', array_keys( $before ) ) );
 		}
-		if ( 0 === strpos( $ability, 'crayn-safe/menu-' ) ) {
+		if ( 0 === strpos( $ability, 'craynai/menu-' ) ) {
 			return MenuAbilities::current_snapshot( $ability, $obj_id );
 		}
 		if ( $obj_id <= 0 ) {
 			return null;
 		}
-		if ( 0 === strpos( $ability, 'crayn-safe/elementor-' ) ) {
+		if ( 0 === strpos( $ability, 'craynai/elementor-' ) ) {
 			return ElementorAbilities::current_snapshot( $obj_id );
 		}
-		if ( 0 === strpos( $ability, 'crayn-safe/post-' ) ) {
+		if ( 0 === strpos( $ability, 'craynai/post-' ) ) {
 			return self::post_snapshot( $obj_id );
 		}
-		if ( 'crayn-safe/seo-update' === $ability ) {
+		if ( 'craynai/seo-update' === $ability ) {
 			return SeoAbilities::seo_snapshot( $obj_id );
 		}
-		if ( 0 === strpos( $ability, 'crayn-safe/wpbakery-' ) ) {
+		if ( 0 === strpos( $ability, 'craynai/wpbakery-' ) ) {
 			return WpbakeryAbilities::current_snapshot( $obj_id );
 		}
-		if ( in_array( $ability, array( 'crayn-safe/rankmath-update', 'crayn-safe/rankmath-schema-set', 'crayn-safe/rankmath-schema-delete' ), true ) ) {
+		if ( in_array( $ability, array( 'craynai/rankmath-update', 'craynai/rankmath-schema-set', 'craynai/rankmath-schema-delete' ), true ) ) {
 			return array( 'post_id' => $obj_id, 'raw' => RankMathAbilities::raw_snapshot( $obj_id ) );
 		}
 		return null;
@@ -471,15 +471,15 @@ class ChangeAbilities extends AbilitiesBase {
 	 */
 	private static function restore_post_snapshot( $post_id, array $before, array $after = array() ) {
 		if ( empty( $before ) ) {
-			return new \WP_Error( 'crayn_safe_no_snapshot', 'The change log has no before snapshot for this post change.' );
+			return new \WP_Error( 'craynai_no_snapshot', 'The change log has no before snapshot for this post change.' );
 		}
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_object_gone', sprintf( 'Post %d no longer exists.', $post_id ) );
+			return new \WP_Error( 'craynai_object_gone', sprintf( 'Post %d no longer exists.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 
 		$postarr = array( 'ID' => $post_id );
@@ -538,7 +538,7 @@ class ChangeAbilities extends AbilitiesBase {
 		if ( ! $rank_math_done && ! empty( $before['seo'] ) && is_array( $before['seo'] ) && ( ! isset( $after['seo'] ) || $after['seo'] !== $before['seo'] ) ) {
 			$seo = SeoAbilities::restore_snapshot( $post_id, $before['seo'] );
 			if ( is_wp_error( $seo ) && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'Crayn Safe MCP: SEO restore issue for post ' . $post_id . ': ' . $seo->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Crayn AI Builder MCP: SEO restore issue for post ' . $post_id . ': ' . $seo->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
 
@@ -555,10 +555,10 @@ class ChangeAbilities extends AbilitiesBase {
 	private static function untrash_post( $post_id, array $before ) {
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_object_gone', sprintf( 'Post %d no longer exists.', $post_id ) );
+			return new \WP_Error( 'craynai_object_gone', sprintf( 'Post %d no longer exists.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 		if ( 'trash' !== $post->post_status ) {
 			return sprintf( 'Post %d is no longer in the trash (status: %s); nothing to restore.', $post_id, $post->post_status );
@@ -566,7 +566,7 @@ class ChangeAbilities extends AbilitiesBase {
 
 		$restored = wp_untrash_post( $post_id );
 		if ( ! $restored ) {
-			return new \WP_Error( 'crayn_safe_untrash_failed', 'The post could not be restored from the trash.' );
+			return new \WP_Error( 'craynai_untrash_failed', 'The post could not be restored from the trash.' );
 		}
 
 		// wp_untrash_post() restores the previous status (draft since WP 5.6); enforce the logged one.
@@ -600,10 +600,10 @@ class ChangeAbilities extends AbilitiesBase {
 	private static function trash_created_post( $post_id ) {
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_object_gone', sprintf( 'Post %d no longer exists (already removed manually?).', $post_id ) );
+			return new \WP_Error( 'craynai_object_gone', sprintf( 'Post %d no longer exists (already removed manually?).', $post_id ) );
 		}
 		if ( ! current_user_can( 'delete_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot delete this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot delete this post.' );
 		}
 
 		if ( 'trash' === $post->post_status ) {
@@ -612,7 +612,7 @@ class ChangeAbilities extends AbilitiesBase {
 
 		$trashed = wp_trash_post( $post_id );
 		if ( ! $trashed ) {
-			return new \WP_Error( 'crayn_safe_trash_failed', 'The post could not be moved to the trash.' );
+			return new \WP_Error( 'craynai_trash_failed', 'The post could not be moved to the trash.' );
 		}
 
 		return sprintf( 'Post %d (created by the reverted change) moved to the trash.', $post_id );
@@ -632,11 +632,11 @@ class ChangeAbilities extends AbilitiesBase {
 
 		$file = isset( $before['plugin_file'] ) ? (string) $before['plugin_file'] : '';
 		if ( '' === $file ) {
-			return new \WP_Error( 'crayn_safe_no_snapshot', 'The change log has no plugin file for this activation change.' );
+			return new \WP_Error( 'craynai_no_snapshot', 'The change log has no plugin file for this activation change.' );
 		}
 
 		if ( 'deactivate' === $target && PluginAbilities::is_self( $file ) ) {
-			return new \WP_Error( 'crayn_safe_self_protected', 'Crayn Safe MCP refuses to deactivate itself. Do this manually in wp-admin.' );
+			return new \WP_Error( 'craynai_self_protected', 'Crayn AI Builder MCP refuses to deactivate itself. Do this manually in wp-admin.' );
 		}
 
 		$network = ! empty( $before['network_active'] );
@@ -666,6 +666,6 @@ class ChangeAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission( $input = array() ) {
-		return current_user_can( 'manage_options' ) && null === Safety::guard( 'crayn-site', false );
+		return current_user_can( 'manage_options' ) && null === Safety::guard( 'craynai-site', false );
 	}
 }

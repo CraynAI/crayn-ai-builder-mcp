@@ -1,11 +1,11 @@
 <?php
 /**
- * Shared safety helpers for Crayn Safe MCP abilities.
+ * Shared safety helpers for Crayn AI Builder MCP abilities.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,13 +24,13 @@ class Safety {
 	 * @return \WP_Error|null Null when the call is allowed, WP_Error otherwise.
 	 */
 	public static function guard( $category, $for_write = false, $dry_run = false ) {
-		$category = preg_replace( '/^crayn-/', '', (string) $category );
+		$category = preg_replace( '/^craynai-/', '', (string) $category );
 		if ( ! Settings::category_enabled( $category ) ) {
 			return new \WP_Error(
-				'crayn_safe_category_disabled',
+				'craynai_category_disabled',
 				sprintf(
 					/* translators: %s: category slug. */
-					__( 'The Crayn Safe MCP category "%s" is disabled in the plugin settings.', 'crayn-safe-mcp' ),
+					__( 'The Crayn AI Builder MCP category "%s" is disabled in the plugin settings.', 'crayn-ai-builder-mcp' ),
 					$category
 				)
 			);
@@ -38,8 +38,8 @@ class Safety {
 
 		if ( $for_write && Settings::read_only() && ! $dry_run ) {
 			return new \WP_Error(
-				'crayn_safe_read_only',
-				__( 'Crayn Safe MCP is in read-only mode. Enable writes in Settings or pass dry_run: true to preview the change.', 'crayn-safe-mcp' )
+				'craynai_read_only',
+				__( 'Crayn AI Builder MCP is in read-only mode. Enable writes in Settings or pass dry_run: true to preview the change.', 'crayn-ai-builder-mcp' )
 			);
 		}
 

@@ -2,15 +2,15 @@
 /**
  * Plugin management abilities: safe updates, activation, rollback and backups.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers "crayn-plugins" abilities. Every write takes a backup first and
+ * Registers "craynai-plugins" abilities. Every write takes a backup first and
  * verifies site health afterwards, rolling back automatically on failure.
  */
 class PluginAbilities extends AbilitiesBase {
@@ -22,13 +22,13 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/plugins-list',
-			'crayn-safe/plugin-update',
-			'crayn-safe/plugin-activate',
-			'crayn-safe/plugin-deactivate',
-			'crayn-safe/plugin-rollback',
-			'crayn-safe/backups-list',
-			'crayn-safe/updates-list',
+			'craynai/plugins-list',
+			'craynai/plugin-update',
+			'craynai/plugin-activate',
+			'craynai/plugin-deactivate',
+			'craynai/plugin-rollback',
+			'craynai/backups-list',
+			'craynai/updates-list',
 		);
 	}
 
@@ -84,14 +84,14 @@ class PluginAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Is this plugin file Crayn Safe MCP itself? It must never update, deactivate or
+	 * Is this plugin file Crayn AI Builder MCP itself? It must never update, deactivate or
 	 * roll back itself (the running code would be replaced mid-request).
 	 *
 	 * @param string $plugin_file Plugin file relative to the plugins dir.
 	 * @return bool
 	 */
 	public static function is_self( $plugin_file ) {
-		return plugin_basename( CRAYN_SAFE_MCP_FILE ) === (string) $plugin_file;
+		return plugin_basename( CRAYN_AI_BUILDER_MCP_FILE ) === (string) $plugin_file;
 	}
 
 	/**
@@ -100,7 +100,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return \WP_Error
 	 */
 	private static function self_error() {
-		return new \WP_Error( 'crayn_safe_self_protected', 'Crayn Safe MCP refuses to update, deactivate or roll back itself. Do this manually in wp-admin.' );
+		return new \WP_Error( 'craynai_self_protected', 'Crayn AI Builder MCP refuses to update, deactivate or roll back itself. Do this manually in wp-admin.' );
 	}
 
 	/**
@@ -116,7 +116,7 @@ class PluginAbilities extends AbilitiesBase {
 		$plugin_file = str_replace( '\\', '/', (string) $plugin_file );
 
 		if ( ! isset( $plugins[ $plugin_file ] ) && 0 < substr_count( $plugin_file, '/' ) ) {
-			return new \WP_Error( 'crayn_safe_plugin_not_found', sprintf( 'Plugin "%s" is not installed.', $plugin_file ) );
+			return new \WP_Error( 'craynai_plugin_not_found', sprintf( 'Plugin "%s" is not installed.', $plugin_file ) );
 		}
 		if ( ! isset( $plugins[ $plugin_file ] ) ) {
 			// Allow passing just a folder name or slug.
@@ -129,7 +129,7 @@ class PluginAbilities extends AbilitiesBase {
 				}
 			}
 			if ( empty( $matches ) ) {
-				return new \WP_Error( 'crayn_safe_plugin_not_found', sprintf( 'Plugin "%s" is not installed.', $plugin_file ) );
+				return new \WP_Error( 'craynai_plugin_not_found', sprintf( 'Plugin "%s" is not installed.', $plugin_file ) );
 			}
 		}
 
@@ -141,17 +141,17 @@ class PluginAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/plugins-list
+	 * craynai/plugins-list
 	 *
 	 * @return void
 	 */
 	private static function register_plugins_list() {
 		wp_register_ability(
-			'crayn-safe/plugins-list',
+			'craynai/plugins-list',
 			array(
 				'label'              => 'List plugins',
 				'description'        => 'List installed plugins: name, plugin file, version, activation state, network activation, pending update availability with the new version, and auto-update status.',
-				'category'           => 'crayn-plugins',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -208,7 +208,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_plugins_list( $input ) {
-		$guard = Safety::guard( 'crayn-plugins', false );
+		$guard = Safety::guard( 'craynai-plugins', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -284,11 +284,11 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function register_plugin_update() {
 		wp_register_ability(
-			'crayn-safe/plugin-update',
+			'craynai/plugin-update',
 			array(
 				'label'              => 'Update plugin (auto-backup + auto-rollback)',
 				'description'        => 'Update a single plugin safely: 1) zip the plugin folder as a backup, 2) run the WordPress upgrader, 3) check site health (front end and wp-admin must respond correctly), 4) if the health check fails, restore the backup, re-activate the plugin and report rolled_back:true. Logged with change_id.',
-				'category'           => 'crayn-plugins',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -324,7 +324,7 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	public static function execute_plugin_update( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-plugins', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-plugins', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -381,25 +381,25 @@ class PluginAbilities extends AbilitiesBase {
 		}
 
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot update plugins.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot update plugins.' );
 		}
 
 		if ( '' === $new_version ) {
-			return new \WP_Error( 'crayn_safe_no_update', 'No update is available for this plugin; nothing was changed.' );
+			return new \WP_Error( 'craynai_no_update', 'No update is available for this plugin; nothing was changed.' );
 		}
 
 		// Step 0: the site must be healthy BEFORE we touch it, otherwise every
 		// update would look "broken" and be rolled back (e.g. loopback blocked).
 		$pre_health = HealthCheck::check();
 		if ( is_wp_error( $pre_health ) ) {
-			return new \WP_Error( 'crayn_safe_unhealthy_before', 'Update not started: the site health check already fails before the update (' . $pre_health->get_error_message() . '). Fix that first; nothing was changed.' );
+			return new \WP_Error( 'craynai_unhealthy_before', 'Update not started: the site health check already fails before the update (' . $pre_health->get_error_message() . '). Fix that first; nothing was changed.' );
 		}
 
 		// Step 1: backup.
 		$backup = PluginBackup::backup( $plugin['file'] );
 		if ( is_wp_error( $backup ) ) {
-			ChangeLogger::log( 'crayn-safe/plugin-update', 'plugin', 0, $before, null, 'update aborted: backup failed - ' . $backup->get_error_message() );
-			return new \WP_Error( 'crayn_safe_backup_failed', 'Update aborted, nothing was written: ' . $backup->get_error_message() );
+			ChangeLogger::log( 'craynai/plugin-update', 'plugin', 0, $before, null, 'update aborted: backup failed - ' . $backup->get_error_message() );
+			return new \WP_Error( 'craynai_backup_failed', 'Update aborted, nothing was written: ' . $backup->get_error_message() );
 		}
 
 		// Step 2: update.
@@ -412,8 +412,8 @@ class PluginAbilities extends AbilitiesBase {
 			wp_clean_plugins_cache( true );
 			$restored = PluginBackup::restore( $backup['file'], true );
 			$restore_note = is_wp_error( $restored ) ? ' restore FAILED: ' . $restored->get_error_message() : ' previous version restored from backup';
-			ChangeLogger::log( 'crayn-safe/plugin-update', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'version' => '', 'rolled_back' => ! is_wp_error( $restored ) ), 'update failed - ' . $message . ';' . $restore_note );
-			return new \WP_Error( 'crayn_safe_update_failed', 'Plugin update failed: ' . $message . ';' . $restore_note . ' (backup: ' . $backup['file'] . ')' );
+			ChangeLogger::log( 'craynai/plugin-update', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'version' => '', 'rolled_back' => ! is_wp_error( $restored ) ), 'update failed - ' . $message . ';' . $restore_note );
+			return new \WP_Error( 'craynai_update_failed', 'Plugin update failed: ' . $message . ';' . $restore_note . ' (backup: ' . $backup['file'] . ')' );
 		}
 
 		// Step 3: health check.
@@ -423,7 +423,7 @@ class PluginAbilities extends AbilitiesBase {
 			// Step 4: automatic rollback.
 			$restored = PluginBackup::restore( $backup['file'], true );
 			$reason   = $health->get_error_message();
-			$change_id = ChangeLogger::log( 'crayn-safe/plugin-update', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'rolled_back' => true, 'reactivated' => ! is_wp_error( $restored ) ), 'update rolled back after health check failure - ' . $reason );
+			$change_id = ChangeLogger::log( 'craynai/plugin-update', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'rolled_back' => true, 'reactivated' => ! is_wp_error( $restored ) ), 'update rolled back after health check failure - ' . $reason );
 
 			return array(
 				'dry_run'     => false,
@@ -446,7 +446,7 @@ class PluginAbilities extends AbilitiesBase {
 			'prev_version' => $plugin['Version'],
 		);
 
-		$change_id = ChangeLogger::log( 'crayn-safe/plugin-update', 'plugin', 0, $before, $after, sprintf( 'plugin updated %s -> %s (backup: %s)', $plugin['Version'], $after['version'], $backup['file'] ) );
+		$change_id = ChangeLogger::log( 'craynai/plugin-update', 'plugin', 0, $before, $after, sprintf( 'plugin updated %s -> %s (backup: %s)', $plugin['Version'], $after['version'], $backup['file'] ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Plugin %s was updated; backup: %s.', $plugin['file'], $backup['file'] ) );
 		}
@@ -473,14 +473,14 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function register_activation_ability( $name, $action ) {
 		wp_register_ability(
-			'crayn-safe/plugin-' . $name,
+			'craynai/plugin-' . $name,
 			array(
 				'label'              => 'activate' === $action ? 'Activate plugin' : 'Deactivate plugin',
 				'description'        => ( 'activate' === $action
 					? 'Activate a plugin, then run a site health check; if the site breaks, roll back to the previous activation state automatically.'
 					: 'Deactivate a plugin, then run a site health check; if the site breaks, undo the deactivation automatically.' )
 					. ' Logged with change_id.',
-				'category'           => 'crayn-plugins',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -556,12 +556,12 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function run_activation_change( $input, $action ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-plugins', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-plugins', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot activate plugins.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot activate plugins.' );
 		}
 
 		$plugin = self::resolve_plugin( isset( $input['plugin_file'] ) ? $input['plugin_file'] : '' );
@@ -583,10 +583,10 @@ class PluginAbilities extends AbilitiesBase {
 		);
 
 		if ( 'activate' === $action && ( $was_active || $was_network ) ) {
-			return new \WP_Error( 'crayn_safe_already_active', sprintf( 'Plugin "%s" is already active.', $file ) );
+			return new \WP_Error( 'craynai_already_active', sprintf( 'Plugin "%s" is already active.', $file ) );
 		}
 		if ( 'deactivate' === $action && ! ( $was_active || $was_network ) ) {
-			return new \WP_Error( 'crayn_safe_already_inactive', sprintf( 'Plugin "%s" is already inactive.', $file ) );
+			return new \WP_Error( 'craynai_already_inactive', sprintf( 'Plugin "%s" is already inactive.', $file ) );
 		}
 
 		$after_planned = array(
@@ -617,7 +617,7 @@ class PluginAbilities extends AbilitiesBase {
 		}
 
 		if ( is_wp_error( $result ) ) {
-			ChangeLogger::log( 'crayn-safe/plugin-' . $action, 'plugin', 0, $before, null, 'operation failed - ' . $result->get_error_message() );
+			ChangeLogger::log( 'craynai/plugin-' . $action, 'plugin', 0, $before, null, 'operation failed - ' . $result->get_error_message() );
 			return $result;
 		}
 
@@ -633,7 +633,7 @@ class PluginAbilities extends AbilitiesBase {
 			}
 
 			$reason    = $health->get_error_message();
-			$change_id = ChangeLogger::log( 'crayn-safe/plugin-' . $action, 'plugin', 0, $before, array( 'rolled_back' => true, 'undone' => $undone ), 'state change rolled back after health check failure - ' . $reason );
+			$change_id = ChangeLogger::log( 'craynai/plugin-' . $action, 'plugin', 0, $before, array( 'rolled_back' => true, 'undone' => $undone ), 'state change rolled back after health check failure - ' . $reason );
 
 			return array(
 				'dry_run'     => false,
@@ -653,7 +653,7 @@ class PluginAbilities extends AbilitiesBase {
 			'network_active' => $was_network && 'activate' === $action,
 		);
 
-		$change_id = ChangeLogger::log( 'crayn-safe/plugin-' . $action, 'plugin', 0, $before, $after, sprintf( 'plugin %sd (%s)', $action, $file ) );
+		$change_id = ChangeLogger::log( 'craynai/plugin-' . $action, 'plugin', 0, $before, $after, sprintf( 'plugin %sd (%s)', $action, $file ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Plugin %s was %sd.', $file, $action ) );
 		}
@@ -677,11 +677,11 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function register_plugin_rollback() {
 		wp_register_ability(
-			'crayn-safe/plugin-rollback',
+			'craynai/plugin-rollback',
 			array(
 				'label'              => 'Rollback plugin from backup',
-				'description'        => 'Restore a plugin from a backup zip created by crayn-safe/plugin-update (see backups-list for file names). Plugin files are restored from the zip and the plugin is re-activated if it was active at backup time. A health check runs after the restore. Logged with change_id.',
-				'category'           => 'crayn-plugins',
+				'description'        => 'Restore a plugin from a backup zip created by craynai/plugin-update (see backups-list for file names). Plugin files are restored from the zip and the plugin is re-activated if it was active at backup time. A health check runs after the restore. Logged with change_id.',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -718,12 +718,12 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	public static function execute_plugin_rollback( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-plugins', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-plugins', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot update plugins.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot update plugins.' );
 		}
 
 		$backup_file = isset( $input['backup_file'] ) ? (string) $input['backup_file'] : '';
@@ -736,7 +736,7 @@ class PluginAbilities extends AbilitiesBase {
 			}
 		}
 		if ( null === $backup ) {
-			return new \WP_Error( 'crayn_safe_backup_not_found', sprintf( 'Backup "%s" not found. Use backups-list to get valid file names.', $backup_file ) );
+			return new \WP_Error( 'craynai_backup_not_found', sprintf( 'Backup "%s" not found. Use backups-list to get valid file names.', $backup_file ) );
 		}
 
 		$plugin = self::resolve_plugin( $backup['plugin'] );
@@ -777,18 +777,18 @@ class PluginAbilities extends AbilitiesBase {
 		// state first so a rollback that breaks the site can itself be undone.
 		$pre_health = HealthCheck::check();
 		if ( is_wp_error( $pre_health ) ) {
-			return new \WP_Error( 'crayn_safe_unhealthy_before', 'Rollback not started: the site health check already fails (' . $pre_health->get_error_message() . '). Nothing was changed.' );
+			return new \WP_Error( 'craynai_unhealthy_before', 'Rollback not started: the site health check already fails (' . $pre_health->get_error_message() . '). Nothing was changed.' );
 		}
 		$current_backup = PluginBackup::backup( $plugin['file'] );
 		if ( is_wp_error( $current_backup ) ) {
-			return new \WP_Error( 'crayn_safe_backup_failed', 'Rollback aborted, nothing was written: ' . $current_backup->get_error_message() );
+			return new \WP_Error( 'craynai_backup_failed', 'Rollback aborted, nothing was written: ' . $current_backup->get_error_message() );
 		}
 
 		$result = PluginBackup::restore( $backup['file'], true );
 		if ( is_wp_error( $result ) ) {
 			// A failed restore may leave the folder half written: put the current state back.
 			PluginBackup::restore( $current_backup['file'], true );
-			ChangeLogger::log( 'crayn-safe/plugin-rollback', 'plugin', 0, $before, array( 'backup_file' => $backup['file'] ), 'rollback failed - ' . $result->get_error_message() );
+			ChangeLogger::log( 'craynai/plugin-rollback', 'plugin', 0, $before, array( 'backup_file' => $backup['file'] ), 'rollback failed - ' . $result->get_error_message() );
 			return $result;
 		}
 
@@ -799,7 +799,7 @@ class PluginAbilities extends AbilitiesBase {
 			$reason   = $health->get_error_message();
 			$undo     = PluginBackup::restore( $current_backup['file'], true );
 			$undo_ok  = ! is_wp_error( $undo );
-			$fail_id  = ChangeLogger::log( 'crayn-safe/plugin-rollback', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'rolled_back' => true, 'undone' => $undo_ok ), 'rollback undone after health check failure - ' . $reason . ( $undo_ok ? '' : ' (undo FAILED: ' . $undo->get_error_message() . ')' ) );
+			$fail_id  = ChangeLogger::log( 'craynai/plugin-rollback', 'plugin', 0, $before, array( 'backup_file' => $backup['file'], 'rolled_back' => true, 'undone' => $undo_ok ), 'rollback undone after health check failure - ' . $reason . ( $undo_ok ? '' : ' (undo FAILED: ' . $undo->get_error_message() . ')' ) );
 			return array(
 				'dry_run'          => false,
 				'before'           => $before,
@@ -821,7 +821,7 @@ class PluginAbilities extends AbilitiesBase {
 			'backup_file'      => $backup['file'],
 		);
 
-		$change_id = ChangeLogger::log( 'crayn-safe/plugin-rollback', 'plugin', 0, $before, array_merge( $after, array( 'health_ok' => $health_ok ) ), sprintf( 'plugin rolled back to %s from %s', $result['version'], $backup['file'] ) );
+		$change_id = ChangeLogger::log( 'craynai/plugin-rollback', 'plugin', 0, $before, array_merge( $after, array( 'health_ok' => $health_ok ) ), sprintf( 'plugin rolled back to %s from %s', $result['version'], $backup['file'] ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Plugin %s was rolled back to %s.', $result['plugin_file'], $result['version'] ) );
 		}
@@ -847,11 +847,11 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function register_backups_list() {
 		wp_register_ability(
-			'crayn-safe/backups-list',
+			'craynai/backups-list',
 			array(
 				'label'              => 'List backups',
-				'description'        => 'List plugin backup zips stored in wp-content/crayn-safe-backups/plugins with size, date, plugin and version. Read only.',
-				'category'           => 'crayn-plugins',
+				'description'        => 'List plugin backup zips stored in wp-content/craynai-backups/plugins with size, date, plugin and version. Read only.',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -897,7 +897,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_backups_list( $input ) {
-		$guard = Safety::guard( 'crayn-plugins', false );
+		$guard = Safety::guard( 'craynai-plugins', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -916,11 +916,11 @@ class PluginAbilities extends AbilitiesBase {
 	 */
 	private static function register_updates_list() {
 		wp_register_ability(
-			'crayn-safe/updates-list',
+			'craynai/updates-list',
 			array(
 				'label'              => 'List available updates',
 				'description'        => 'List available WordPress core, plugin and theme updates with current and new versions. Read only.',
-				'category'           => 'crayn-plugins',
+				'category'           => 'craynai-plugins',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(),
@@ -977,7 +977,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_updates_list( $input ) {
-		$guard = Safety::guard( 'crayn-plugins', false );
+		$guard = Safety::guard( 'craynai-plugins', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -1046,7 +1046,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission_read( $input = array() ) {
-		return current_user_can( 'activate_plugins' ) && null === Safety::guard( 'crayn-plugins', false );
+		return current_user_can( 'activate_plugins' ) && null === Safety::guard( 'craynai-plugins', false );
 	}
 
 	/**
@@ -1056,7 +1056,7 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission_update( $input = array() ) {
-		return current_user_can( 'update_plugins' ) && null === Safety::guard( 'crayn-plugins', false );
+		return current_user_can( 'update_plugins' ) && null === Safety::guard( 'craynai-plugins', false );
 	}
 
 	/**
@@ -1066,6 +1066,6 @@ class PluginAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission_activate( $input = array() ) {
-		return current_user_can( 'activate_plugins' ) && null === Safety::guard( 'crayn-plugins', false );
+		return current_user_can( 'activate_plugins' ) && null === Safety::guard( 'craynai-plugins', false );
 	}
 }

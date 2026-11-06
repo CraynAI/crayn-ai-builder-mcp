@@ -2,15 +2,15 @@
 /**
  * Site health ability.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers "crayn-site" abilities (read only).
+ * Registers "craynai-site" abilities (read only).
  */
 class SiteAbilities {
 
@@ -21,7 +21,7 @@ class SiteAbilities {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/site-health',
+			'craynai/site-health',
 		);
 	}
 
@@ -35,17 +35,17 @@ class SiteAbilities {
 	}
 
 	/**
-	 * crayn-safe/site-health
+	 * craynai/site-health
 	 *
 	 * @return void
 	 */
 	private static function register_site_health() {
 		wp_register_ability(
-			'crayn-safe/site-health',
+			'craynai/site-health',
 			array(
 				'label'              => 'Site health',
 				'description'        => 'Get site health details: WordPress version, PHP version, active theme, debug flags, pending update counts, free disk space (when available) and the last 10 debug log entries.',
-				'category'           => 'crayn-site',
+				'category'           => 'craynai-site',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(),
@@ -97,7 +97,7 @@ class SiteAbilities {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_site_health( $input = array() ) {
-		$guard = Safety::guard( 'crayn-site', false );
+		$guard = Safety::guard( 'craynai-site', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -201,6 +201,6 @@ class SiteAbilities {
 	 * @return bool
 	 */
 	public static function permission( $input = array() ) {
-		return current_user_can( 'manage_options' ) && null === Safety::guard( 'crayn-site', false );
+		return current_user_can( 'manage_options' ) && null === Safety::guard( 'craynai-site', false );
 	}
 }

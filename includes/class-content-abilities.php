@@ -2,15 +2,15 @@
 /**
  * Content abilities: posts, media and terms.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the "crayn-content" category abilities.
+ * Registers the "craynai-content" category abilities.
  */
 class ContentAbilities extends AbilitiesBase {
 
@@ -21,15 +21,15 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/posts-list',
-			'crayn-safe/post-get',
-			'crayn-safe/post-create',
-			'crayn-safe/post-update',
-			'crayn-safe/post-trash',
-			'crayn-safe/media-list',
-			'crayn-safe/media-upload-from-url',
-			'crayn-safe/terms-list',
-			'crayn-safe/term-create',
+			'craynai/posts-list',
+			'craynai/post-get',
+			'craynai/post-create',
+			'craynai/post-update',
+			'craynai/post-trash',
+			'craynai/media-list',
+			'craynai/media-upload-from-url',
+			'craynai/terms-list',
+			'craynai/term-create',
 		);
 	}
 
@@ -71,7 +71,7 @@ class ContentAbilities extends AbilitiesBase {
 			return null;
 		}
 		if ( ! RankMathAbilities::is_active() ) {
-			return new \WP_Error( 'crayn_safe_no_rankmath', 'The rankmath input needs Rank Math to be active.' );
+			return new \WP_Error( 'craynai_no_rankmath', 'The rankmath input needs Rank Math to be active.' );
 		}
 		return RankMathAbilities::plan( $input['rankmath'], $raw );
 	}
@@ -86,10 +86,10 @@ class ContentAbilities extends AbilitiesBase {
 	private static function check_create_caps( $post_type, $status ) {
 		$pto = get_post_type_object( $post_type );
 		if ( ! $pto || empty( $pto->show_ui ) || 'attachment' === $post_type ) {
-			return new \WP_Error( 'crayn_safe_bad_post_type', sprintf( 'Post type "%s" is not available for creation.', $post_type ) );
+			return new \WP_Error( 'craynai_bad_post_type', sprintf( 'Post type "%s" is not available for creation.', $post_type ) );
 		}
 		if ( ! current_user_can( $pto->cap->create_posts ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot create posts of this type.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot create posts of this type.' );
 		}
 		return self::check_publish_cap( $pto, $status );
 	}
@@ -103,7 +103,7 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	private static function check_publish_cap( $pto, $status ) {
 		if ( in_array( $status, array( 'publish', 'future', 'private' ), true ) && ! current_user_can( $pto->cap->publish_posts ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You are not allowed to publish posts of this type.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You are not allowed to publish posts of this type.' );
 		}
 		return null;
 	}
@@ -118,17 +118,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/posts-list
+	 * craynai/posts-list
 	 *
 	 * @return void
 	 */
 	private static function register_posts_list() {
 		wp_register_ability(
-			'crayn-safe/posts-list',
+			'craynai/posts-list',
 			array(
 				'label'              => 'List posts',
 				'description'        => 'List published or any status posts/pages/CPTs with pagination and optional search.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -200,7 +200,7 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_posts_list( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -251,17 +251,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/post-get
+	 * craynai/post-get
 	 *
 	 * @return void
 	 */
 	private static function register_post_get() {
 		wp_register_ability(
-			'crayn-safe/post-get',
+			'craynai/post-get',
 			array(
 				'label'              => 'Get post',
 				'description'        => 'Get a single post with full fields: title, content, excerpt, status, slug, terms, featured image and modified date.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -313,7 +313,7 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_post_get( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -321,10 +321,10 @@ class ContentAbilities extends AbilitiesBase {
 		$post_id = isset( $input['id'] ) ? (int) $input['id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot access this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot access this post.' );
 		}
 
 		$terms = array();
@@ -359,17 +359,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/post-create
+	 * craynai/post-create
 	 *
 	 * @return void
 	 */
 	private static function register_post_create() {
 		wp_register_ability(
-			'crayn-safe/post-create',
+			'craynai/post-create',
 			array(
 				'label'              => 'Create post',
 				'description'        => 'Create a new post/page. Default status is draft. Accepts dry_run to preview the change without writing. Every real write is logged with a change_id you can revert.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -441,7 +441,7 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function execute_post_create( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-content', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-content', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -451,7 +451,7 @@ class ContentAbilities extends AbilitiesBase {
 		}
 		// WordPress refuses such a post on the real call: the preview must say so too.
 		if ( '' === trim( (string) ( isset( $input['title'] ) ? $input['title'] : '' ) . (string) ( isset( $input['content'] ) ? $input['content'] : '' ) . (string) ( isset( $input['excerpt'] ) ? $input['excerpt'] : '' ) ) ) {
-			return new \WP_Error( 'crayn_safe_empty_post', 'A post needs a title, content or excerpt.' );
+			return new \WP_Error( 'craynai_empty_post', 'A post needs a title, content or excerpt.' );
 		}
 		$rm_plan = self::plan_rankmath( $input, array() );
 		if ( is_wp_error( $rm_plan ) ) {
@@ -511,7 +511,7 @@ class ContentAbilities extends AbilitiesBase {
 		}
 
 		$change_id = ChangeLogger::log(
-			'crayn-safe/post-create',
+			'craynai/post-create',
 			'post',
 			$post_id,
 			null,
@@ -577,7 +577,7 @@ class ContentAbilities extends AbilitiesBase {
 	private static function check_term_lists( $input ) {
 		foreach ( array( 'categories', 'tags' ) as $field ) {
 			if ( isset( $input[ $field ] ) && ! is_array( $input[ $field ] ) ) {
-				return new \WP_Error( 'crayn_safe_bad_input', sprintf( '%s must be an array of term ids.', $field ) );
+				return new \WP_Error( 'craynai_bad_input', sprintf( '%s must be an array of term ids.', $field ) );
 			}
 		}
 		return null;
@@ -611,17 +611,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/post-update
+	 * craynai/post-update
 	 *
 	 * @return void
 	 */
 	private static function register_post_update() {
 		wp_register_ability(
-			'crayn-safe/post-update',
+			'craynai/post-update',
 			array(
 				'label'              => 'Update post',
 				'description'        => 'Update an existing post: title, content, excerpt, status, slug, categories, tags and featured image. Only the fields you pass are changed. Accepts dry_run to preview {before, after}. Logged with change_id for reverts.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -676,7 +676,7 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function execute_post_update( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-content', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-content', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -688,10 +688,10 @@ class ContentAbilities extends AbilitiesBase {
 		$post_id = isset( $input['id'] ) ? (int) $input['id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 
 		if ( isset( $input['status'] ) && (string) $input['status'] !== $post->post_status ) {
@@ -779,7 +779,7 @@ class ContentAbilities extends AbilitiesBase {
 			RankMathAbilities::commit( $post_id, $rm_plan['ops'] );
 		}
 
-		$change_id = ChangeLogger::log( 'crayn-safe/post-update', 'post', $post_id, $before, self::post_snapshot( $post_id ), 'post fields updated' );
+		$change_id = ChangeLogger::log( 'craynai/post-update', 'post', $post_id, $before, self::post_snapshot( $post_id ), 'post fields updated' );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Post %d was updated.', $post_id ) );
 		}
@@ -797,17 +797,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/post-trash
+	 * craynai/post-trash
 	 *
 	 * @return void
 	 */
 	private static function register_post_trash() {
 		wp_register_ability(
-			'crayn-safe/post-trash',
+			'craynai/post-trash',
 			array(
 				'label'              => 'Trash post',
 				'description'        => 'Move a post to the trash. Nothing is ever hard deleted: the post keeps its content in the trash and the logged snapshot lets you restore its previous status.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -837,7 +837,7 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function execute_post_trash( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-content', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-content', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -845,10 +845,10 @@ class ContentAbilities extends AbilitiesBase {
 		$post_id = isset( $input['id'] ) ? (int) $input['id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'delete_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot delete this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot delete this post.' );
 		}
 
 		$before = array(
@@ -870,10 +870,10 @@ class ContentAbilities extends AbilitiesBase {
 
 		$trashed = wp_trash_post( $post_id );
 		if ( ! $trashed ) {
-			return new \WP_Error( 'crayn_safe_trash_failed', 'The post could not be moved to the trash.' );
+			return new \WP_Error( 'craynai_trash_failed', 'The post could not be moved to the trash.' );
 		}
 
-		$change_id = ChangeLogger::log( 'crayn-safe/post-trash', 'post', $post_id, $before, array( 'ID' => $post_id, 'post_status' => 'trash' ), 'post moved to trash (safe deletion, never hard deleted)' );
+		$change_id = ChangeLogger::log( 'craynai/post-trash', 'post', $post_id, $before, array( 'ID' => $post_id, 'post_status' => 'trash' ), 'post moved to trash (safe deletion, never hard deleted)' );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Post %d was moved to the trash.', $post_id ) );
 		}
@@ -888,17 +888,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/media-list
+	 * craynai/media-list
 	 *
 	 * @return void
 	 */
 	private static function register_media_list() {
 		wp_register_ability(
-			'crayn-safe/media-list',
+			'craynai/media-list',
 			array(
 				'label'              => 'List media',
 				'description'        => 'List media library items with pagination and optional search.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -953,7 +953,7 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_media_list( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -995,17 +995,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/media-upload-from-url
+	 * craynai/media-upload-from-url
 	 *
 	 * @return void
 	 */
 	private static function register_media_upload_from_url() {
 		wp_register_ability(
-			'crayn-safe/media-upload-from-url',
+			'craynai/media-upload-from-url',
 			array(
 				'label'              => 'Upload media from URL',
 				'description'        => 'Download an image/file from a URL into the media library. Accepts dry_run. Logged with change_id.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -1032,7 +1032,7 @@ class ContentAbilities extends AbilitiesBase {
 				),
 				'execute_callback'   => array( self::class, 'execute_media_upload_from_url' ),
 				'permission_callback' => static function ( $input = array() ) {
-					return current_user_can( 'upload_files' ) && null === Safety::guard( 'crayn-content', false );
+					return current_user_can( 'upload_files' ) && null === Safety::guard( 'craynai-content', false );
 				},
 				'meta'               => Safety::meta( Safety::annotations( false, false, false, 'Upload Media From URL' ) ),
 			)
@@ -1047,27 +1047,27 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function execute_media_upload_from_url( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-content', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-content', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 
 		$url = isset( $input['url'] ) ? (string) $input['url'] : '';
 		if ( '' === $url || ! ( wp_parse_url( $url, PHP_URL_HOST ) && in_array( wp_parse_url( $url, PHP_URL_SCHEME ), array( 'http', 'https' ), true ) ) ) {
-			return new \WP_Error( 'crayn_safe_invalid_url', 'A valid http/https URL is required.' );
+			return new \WP_Error( 'craynai_invalid_url', 'A valid http/https URL is required.' );
 		}
 
 		if ( ! wp_http_validate_url( $url ) ) {
-			return new \WP_Error( 'crayn_safe_unsafe_url', 'The URL is not allowed (private/internal hosts, unusual ports and non-http(s) schemes are rejected).' );
+			return new \WP_Error( 'craynai_unsafe_url', 'The URL is not allowed (private/internal hosts, unusual ports and non-http(s) schemes are rejected).' );
 		}
 
 		$parent = isset( $input['post_id'] ) ? (int) $input['post_id'] : 0;
 		if ( $parent > 0 ) {
 			if ( ! get_post( $parent ) ) {
-				return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Parent post %d does not exist.', $parent ) );
+				return new \WP_Error( 'craynai_post_not_found', sprintf( 'Parent post %d does not exist.', $parent ) );
 			}
 			if ( ! current_user_can( 'edit_post', $parent ) ) {
-				return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot attach media to this post.' );
+				return new \WP_Error( 'craynai_permission_denied', 'You cannot attach media to this post.' );
 			}
 		}
 
@@ -1099,16 +1099,16 @@ class ContentAbilities extends AbilitiesBase {
 
 		$tmp = download_url( $url ); // Uses wp_safe_remote_get (rejects unsafe URLs).
 		if ( is_wp_error( $tmp ) ) {
-			return new \WP_Error( 'crayn_safe_download_failed', 'Could not download the file: ' . $tmp->get_error_message() );
+			return new \WP_Error( 'craynai_download_failed', 'Could not download the file: ' . $tmp->get_error_message() );
 		}
 		if ( filesize( $tmp ) > wp_max_upload_size() ) {
 			wp_delete_file( $tmp );
-			return new \WP_Error( 'crayn_safe_file_too_large', 'The downloaded file exceeds the maximum upload size.' );
+			return new \WP_Error( 'craynai_file_too_large', 'The downloaded file exceeds the maximum upload size.' );
 		}
 
 		$path      = wp_parse_url( $url, PHP_URL_PATH );
 		$basename  = $path ? basename( $path ) : '';
-		$file_name = sanitize_file_name( ( '' !== $basename ? $basename : 'crayn-safe-media-' . time() ) );
+		$file_name = sanitize_file_name( ( '' !== $basename ? $basename : 'craynai-media-' . time() ) );
 
 		$file_array = array(
 			'name'     => $file_name,
@@ -1118,7 +1118,7 @@ class ContentAbilities extends AbilitiesBase {
 
 		if ( is_wp_error( $attachment ) ) {
 			wp_delete_file( $tmp );
-			return new \WP_Error( 'crayn_safe_sideload_failed', 'Could not import the file into the media library: ' . $attachment->get_error_message() );
+			return new \WP_Error( 'craynai_sideload_failed', 'Could not import the file into the media library: ' . $attachment->get_error_message() );
 		}
 		wp_delete_file( $tmp );
 
@@ -1127,7 +1127,7 @@ class ContentAbilities extends AbilitiesBase {
 		}
 
 		$change_id = ChangeLogger::log(
-			'crayn-safe/media-upload-from-url',
+			'craynai/media-upload-from-url',
 			'attachment',
 			$attachment,
 			null,
@@ -1160,17 +1160,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/terms-list
+	 * craynai/terms-list
 	 *
 	 * @return void
 	 */
 	private static function register_terms_list() {
 		wp_register_ability(
-			'crayn-safe/terms-list',
+			'craynai/terms-list',
 			array(
 				'label'              => 'List terms',
 				'description'        => 'List terms of a taxonomy (e.g. category, post_tag).',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -1225,14 +1225,14 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_terms_list( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 
 		$taxonomy = isset( $input['taxonomy'] ) ? (string) $input['taxonomy'] : '';
 		if ( ! taxonomy_exists( $taxonomy ) ) {
-			return new \WP_Error( 'crayn_safe_taxonomy_not_found', sprintf( 'Taxonomy "%s" does not exist.', $taxonomy ) );
+			return new \WP_Error( 'craynai_taxonomy_not_found', sprintf( 'Taxonomy "%s" does not exist.', $taxonomy ) );
 		}
 
 		$per_page = isset( $input['per_page'] ) ? max( 1, min( 100, (int) $input['per_page'] ) ) : 50;
@@ -1271,17 +1271,17 @@ class ContentAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/term-create
+	 * craynai/term-create
 	 *
 	 * @return void
 	 */
 	private static function register_term_create() {
 		wp_register_ability(
-			'crayn-safe/term-create',
+			'craynai/term-create',
 			array(
 				'label'              => 'Create term',
 				'description'        => 'Create a term (category, tag, …). Accepts dry_run. Logged with change_id. Note: newly created terms are not auto-deleted by revert to keep trash-only safety.',
-				'category'           => 'crayn-content',
+				'category'           => 'craynai-content',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -1312,19 +1312,19 @@ class ContentAbilities extends AbilitiesBase {
 	 */
 	public static function execute_term_create( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-content', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-content', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 
 		$taxonomy = isset( $input['taxonomy'] ) ? (string) $input['taxonomy'] : '';
 		if ( ! taxonomy_exists( $taxonomy ) ) {
-			return new \WP_Error( 'crayn_safe_taxonomy_not_found', sprintf( 'Taxonomy "%s" does not exist.', $taxonomy ) );
+			return new \WP_Error( 'craynai_taxonomy_not_found', sprintf( 'Taxonomy "%s" does not exist.', $taxonomy ) );
 		}
 
 		$name = isset( $input['name'] ) ? (string) $input['name'] : '';
 		if ( '' === $name ) {
-			return new \WP_Error( 'crayn_safe_term_name_required', 'A term name is required.' );
+			return new \WP_Error( 'craynai_term_name_required', 'A term name is required.' );
 		}
 
 		$after = array(
@@ -1362,7 +1362,7 @@ class ContentAbilities extends AbilitiesBase {
 		}
 
 		$term_id = (int) $new_term['term_id'];
-		$change_id = ChangeLogger::log( 'crayn-safe/term-create', 'term', $term_id, null, $after, 'term created (not auto-revertible; created terms stay)' );
+		$change_id = ChangeLogger::log( 'craynai/term-create', 'term', $term_id, null, $after, 'term created (not auto-revertible; created terms stay)' );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Term %d was created.', $term_id ) );
 		}
@@ -1383,7 +1383,7 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission_read( $input = array() ) {
-		return current_user_can( 'edit_posts' ) && null === Safety::guard( 'crayn-content', false );
+		return current_user_can( 'edit_posts' ) && null === Safety::guard( 'craynai-content', false );
 	}
 
 	/**
@@ -1393,7 +1393,7 @@ class ContentAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission_media_read( $input = array() ) {
-		return current_user_can( 'upload_files' ) && null === Safety::guard( 'crayn-content', false );
+		return current_user_can( 'upload_files' ) && null === Safety::guard( 'craynai-content', false );
 	}
 
 	/**
@@ -1405,7 +1405,7 @@ class ContentAbilities extends AbilitiesBase {
 	public static function permission_content_write( $input = array() ) {
 		$post_id = ( is_array( $input ) && isset( $input['id'] ) ) ? (int) $input['id'] : 0;
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-content', false );
+		return $can && null === Safety::guard( 'craynai-content', false );
 	}
 
 	/**
@@ -1419,8 +1419,8 @@ class ContentAbilities extends AbilitiesBase {
 		$tax      = $taxonomy ? get_taxonomy( $taxonomy ) : null;
 		if ( ! $tax ) {
 			// Let the tool answer "taxonomy not found" instead of a permission error.
-			return current_user_can( 'edit_posts' ) && null === Safety::guard( 'crayn-content', false );
+			return current_user_can( 'edit_posts' ) && null === Safety::guard( 'craynai-content', false );
 		}
-		return current_user_can( $tax->cap->edit_terms ) && null === Safety::guard( 'crayn-content', false );
+		return current_user_can( $tax->cap->edit_terms ) && null === Safety::guard( 'craynai-content', false );
 	}
 }

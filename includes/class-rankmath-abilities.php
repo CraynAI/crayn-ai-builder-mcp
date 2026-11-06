@@ -25,15 +25,15 @@
  * - Redirections: RankMath\Redirections\Redirection::from()->save() / DB::update() /
  *   DB::change_status() (modules/redirections/class-redirection.php, class-db.php).
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the Rank Math abilities (category crayn-seo) when Rank Math is active.
+ * Registers the Rank Math abilities (category craynai-seo) when Rank Math is active.
  */
 class RankMathAbilities extends AbilitiesBase {
 
@@ -93,14 +93,14 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		$names = array(
-			'crayn-safe/rankmath-get',
-			'crayn-safe/rankmath-update',
-			'crayn-safe/rankmath-schema-set',
-			'crayn-safe/rankmath-schema-delete',
-			'crayn-safe/rankmath-analyze',
+			'craynai/rankmath-get',
+			'craynai/rankmath-update',
+			'craynai/rankmath-schema-set',
+			'craynai/rankmath-schema-delete',
+			'craynai/rankmath-analyze',
 		);
 		if ( self::redirections_available() ) {
-			$names[] = 'crayn-safe/rankmath-redirect-set';
+			$names[] = 'craynai/rankmath-redirect-set';
 		}
 		return $names;
 	}
@@ -257,11 +257,11 @@ class RankMathAbilities extends AbilitiesBase {
 	private static function check_keys( array $fields, array $tree, $prefix = '' ) {
 		foreach ( $fields as $key => $value ) {
 			if ( ! isset( $tree[ $key ] ) ) {
-				return new \WP_Error( 'crayn_safe_unknown_field', sprintf( 'Unknown Rank Math field "%s%s".', $prefix, $key ) );
+				return new \WP_Error( 'craynai_unknown_field', sprintf( 'Unknown Rank Math field "%s%s".', $prefix, $key ) );
 			}
 			if ( is_array( $tree[ $key ] ) ) {
 				if ( ! is_array( $value ) ) {
-					return new \WP_Error( 'crayn_safe_bad_field', sprintf( 'Field "%s%s" must be an object.', $prefix, $key ) );
+					return new \WP_Error( 'craynai_bad_field', sprintf( 'Field "%s%s" must be an object.', $prefix, $key ) );
 				}
 				$err = self::check_keys( $value, $tree[ $key ], $prefix . $key . '.' );
 				if ( $err ) {
@@ -320,7 +320,7 @@ class RankMathAbilities extends AbilitiesBase {
 				}
 				$clean = esc_url_raw( $v );
 				if ( '' === $clean ) {
-					return new \WP_Error( 'crayn_safe_bad_url', sprintf( 'Field "%s" must be a valid URL.', $path ) );
+					return new \WP_Error( 'craynai_bad_url', sprintf( 'Field "%s" must be a valid URL.', $path ) );
 				}
 				return array( 'set', $clean );
 			case 'term':
@@ -330,7 +330,7 @@ class RankMathAbilities extends AbilitiesBase {
 				}
 				$term = get_term( $id );
 				if ( ! $term || is_wp_error( $term ) ) {
-					return new \WP_Error( 'crayn_safe_bad_term', sprintf( 'Field "%s": term %d does not exist.', $path, $id ) );
+					return new \WP_Error( 'craynai_bad_term', sprintf( 'Field "%s": term %d does not exist.', $path, $id ) );
 				}
 				return array( 'set', (string) $id );
 			case 'attachment':
@@ -339,7 +339,7 @@ class RankMathAbilities extends AbilitiesBase {
 					return $del;
 				}
 				if ( 'attachment' !== get_post_type( $id ) ) {
-					return new \WP_Error( 'crayn_safe_bad_attachment', sprintf( 'Field "%s": %d is not a media attachment.', $path, $id ) );
+					return new \WP_Error( 'craynai_bad_attachment', sprintf( 'Field "%s": %d is not a media attachment.', $path, $id ) );
 				}
 				return array( 'set', (string) $id );
 			case 'onoff':
@@ -368,7 +368,7 @@ class RankMathAbilities extends AbilitiesBase {
 						continue;
 					}
 					if ( ! in_array( $token, self::ROBOTS, true ) ) {
-						return new \WP_Error( 'crayn_safe_bad_robots', sprintf( 'Unknown robots directive "%s". Allowed: %s.', $token, implode( ', ', self::ROBOTS ) ) );
+						return new \WP_Error( 'craynai_bad_robots', sprintf( 'Unknown robots directive "%s". Allowed: %s.', $token, implode( ', ', self::ROBOTS ) ) );
 					}
 					$out[] = $token;
 				}
@@ -383,7 +383,7 @@ class RankMathAbilities extends AbilitiesBase {
 				return array( 'set', array_values( array_unique( $out ) ) );
 			case 'advrobots':
 				if ( ! is_array( $value ) ) {
-					return new \WP_Error( 'crayn_safe_bad_field', sprintf( 'Field "%s" must be an object.', $path ) );
+					return new \WP_Error( 'craynai_bad_field', sprintf( 'Field "%s" must be an object.', $path ) );
 				}
 				if ( empty( $value ) ) {
 					return $del;
@@ -397,11 +397,11 @@ class RankMathAbilities extends AbilitiesBase {
 				foreach ( $value as $k => $v ) {
 					$k = isset( $aliases[ $k ] ) ? $aliases[ $k ] : $k;
 					if ( ! in_array( $k, array_values( $aliases ), true ) ) {
-						return new \WP_Error( 'crayn_safe_bad_field', sprintf( 'Unknown advanced_robots key "%s".', $k ) );
+						return new \WP_Error( 'craynai_bad_field', sprintf( 'Unknown advanced_robots key "%s".', $k ) );
 					}
 					if ( 'max-image-preview' === $k ) {
 						if ( ! in_array( (string) $v, array( 'none', 'standard', 'large' ), true ) ) {
-							return new \WP_Error( 'crayn_safe_bad_field', 'max-image-preview must be none, standard or large.' );
+							return new \WP_Error( 'craynai_bad_field', 'max-image-preview must be none, standard or large.' );
 						}
 						$current[ $k ] = (string) $v;
 					} else {
@@ -410,7 +410,7 @@ class RankMathAbilities extends AbilitiesBase {
 				}
 				return array( 'set', $current );
 		}
-		return new \WP_Error( 'crayn_safe_internal', 'Unhandled field type ' . $type );
+		return new \WP_Error( 'craynai_internal', 'Unhandled field type ' . $type );
 	}
 
 	/**
@@ -630,13 +630,13 @@ class RankMathAbilities extends AbilitiesBase {
 	public static function revert_change( array $before, array $after ) {
 		$post_id = isset( $after['post_id'] ) ? (int) $after['post_id'] : ( isset( $before['post_id'] ) ? (int) $before['post_id'] : 0 );
 		if ( $post_id <= 0 || ! get_post( $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_object_gone', 'The post of this Rank Math change no longer exists.' );
+			return new \WP_Error( 'craynai_object_gone', 'The post of this Rank Math change no longer exists.' );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 		if ( ! isset( $before['raw'] ) || ! is_array( $before['raw'] ) || empty( $before['keys'] ) ) {
-			return new \WP_Error( 'crayn_safe_no_snapshot', 'The change log has no Rank Math snapshot for this change.' );
+			return new \WP_Error( 'craynai_no_snapshot', 'The change log has no Rank Math snapshot for this change.' );
 		}
 		self::restore_raw( $post_id, $before['raw'], (array) $before['keys'] );
 		return sprintf( 'Rank Math meta of post %d restored (%s).', $post_id, implode( ', ', (array) $before['keys'] ) );
@@ -877,7 +877,7 @@ class RankMathAbilities extends AbilitiesBase {
 	public static function permission_post( $input = array() ) {
 		$post_id = ( is_array( $input ) && isset( $input['post_id'] ) ) ? (int) $input['post_id'] : 0;
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-seo', false );
+		return $can && null === Safety::guard( 'craynai-seo', false );
 	}
 
 	/**
@@ -889,20 +889,20 @@ class RankMathAbilities extends AbilitiesBase {
 	 * @return \WP_Post|\WP_Error
 	 */
 	private static function preflight( $input, $write, $dry_run ) {
-		$guard = Safety::guard( 'crayn-seo', $write, $dry_run );
+		$guard = Safety::guard( 'craynai-seo', $write, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! self::is_active() ) {
-			return new \WP_Error( 'crayn_safe_no_rankmath', 'Rank Math is not active.' );
+			return new \WP_Error( 'craynai_no_rankmath', 'Rank Math is not active.' );
 		}
 		$post_id = isset( $input['post_id'] ) ? (int) $input['post_id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 		return $post;
 	}
@@ -1038,11 +1038,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_get() {
 		wp_register_ability(
-			'crayn-safe/rankmath-get',
+			'craynai/rankmath-get',
 			array(
 				'label'               => 'Get Rank Math data',
 				'description'         => 'Read ALL Rank Math SEO data of a post: title, description, focus keywords, pillar flag, robots, advanced robots, canonical, breadcrumb title, primary category, Facebook and Twitter tabs, SEO score, schemas (decoded), the redirection of the post (Redirections module) and a raw map of every rank_math_* meta with exists flags.',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -1114,11 +1114,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_update() {
 		wp_register_ability(
-			'crayn-safe/rankmath-update',
+			'craynai/rankmath-update',
 			array(
 				'label'               => 'Update Rank Math data',
 				'description'         => 'Write any subset of the Rank Math editor fields of a post (title, description, focus_keywords, pillar_content, robots, advanced_robots, canonical_url, breadcrumb_title, primary_category, facebook{}, twitter{}). Only provided fields are written; an empty value deletes the meta. Supports dry_run ({before, after}); every real write is logged and revertible with change-revert.',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array_merge(
@@ -1183,7 +1183,7 @@ class RankMathAbilities extends AbilitiesBase {
 		$raw_after = self::raw_snapshot( $post_id );
 
 		list( $b, $a ) = self::log_payloads( $post_id, $raw_before, $raw_after );
-		$change_id     = ChangeLogger::log( 'crayn-safe/rankmath-update', 'rankmath', $post_id, $b, $a, 'Rank Math fields updated: ' . implode( ', ', $plan['changed'] ) );
+		$change_id     = ChangeLogger::log( 'craynai/rankmath-update', 'rankmath', $post_id, $b, $a, 'Rank Math fields updated: ' . implode( ', ', $plan['changed'] ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Rank Math fields of post %d were updated.', $post_id ) );
 		}
@@ -1209,11 +1209,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_schema_set() {
 		wp_register_ability(
-			'crayn-safe/rankmath-schema-set',
+			'craynai/rankmath-schema-set',
 			array(
 				'label'               => 'Set Rank Math schema',
 				'description'         => 'Add a schema (JSON-LD) to a post in Rank Math\'s own storage format (post meta rank_math_schema_<Type> with the editor "metadata" block). Supported: ' . implode( ', ', self::SCHEMA_TYPES ) . '. "data" holds the schema.org properties (Rank Math variables like %seo_title% work). FAQPage example: {"mainEntity":[{"@type":"Question","name":"Q?","acceptedAnswer":{"@type":"Answer","text":"A."}}]}. With replace_existing=true all existing schemas of the same type are replaced. Supports dry_run; logged and revertible.',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -1302,7 +1302,7 @@ class RankMathAbilities extends AbilitiesBase {
 
 		$type = isset( $input['schema_type'] ) ? (string) $input['schema_type'] : '';
 		if ( ! in_array( $type, self::SCHEMA_TYPES, true ) ) {
-			return new \WP_Error( 'crayn_safe_bad_schema_type', sprintf( 'Unsupported schema type "%s". Allowed: %s.', $type, implode( ', ', self::SCHEMA_TYPES ) ) );
+			return new \WP_Error( 'craynai_bad_schema_type', sprintf( 'Unsupported schema type "%s". Allowed: %s.', $type, implode( ', ', self::SCHEMA_TYPES ) ) );
 		}
 		$data = ( isset( $input['data'] ) && is_array( $input['data'] ) ) ? $input['data'] : array();
 		unset( $data['@type'], $data['metadata'], $data['@context'] );
@@ -1352,13 +1352,13 @@ class RankMathAbilities extends AbilitiesBase {
 		// Same calls as Rank Math's editor (rest/class-shared.php update_schemas): add + shortcut meta.
 		$meta_id = add_metadata( 'post', $post_id, $meta_key, wp_slash( $schema ) );
 		if ( ! $meta_id ) {
-			return new \WP_Error( 'crayn_safe_schema_write_failed', 'The schema could not be stored.' );
+			return new \WP_Error( 'craynai_schema_write_failed', 'The schema could not be stored.' );
 		}
 		add_metadata( 'post', $post_id, 'rank_math_shortcode_schema_' . $shortcode, (int) $meta_id );
 
 		$raw_after     = self::raw_snapshot( $post_id );
 		list( $b, $a ) = self::log_payloads( $post_id, $raw_before, $raw_after );
-		$change_id     = ChangeLogger::log( 'crayn-safe/rankmath-schema-set', 'rankmath', $post_id, $b, $a, sprintf( '%s schema %s on post %d', $type, $replace ? 'replaced' : 'added', $post_id ) );
+		$change_id     = ChangeLogger::log( 'craynai/rankmath-schema-set', 'rankmath', $post_id, $b, $a, sprintf( '%s schema %s on post %d', $type, $replace ? 'replaced' : 'added', $post_id ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'A %s schema was stored on post %d.', $type, $post_id ) );
 		}
@@ -1381,11 +1381,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_schema_delete() {
 		wp_register_ability(
-			'crayn-safe/rankmath-schema-delete',
+			'craynai/rankmath-schema-delete',
 			array(
 				'label'               => 'Delete Rank Math schema',
 				'description'         => 'Remove a Rank Math schema from a post by its meta key (for example rank_math_schema_FAQPage; get keys and meta ids from rankmath-get). Pass meta_id to remove only one of several schemas stored under the same key. Revertible: the schema is restored from the change log.',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -1425,13 +1425,13 @@ class RankMathAbilities extends AbilitiesBase {
 		$post_id  = (int) $post->ID;
 		$meta_key = isset( $input['meta_key'] ) ? (string) $input['meta_key'] : '';
 		if ( 0 !== strpos( $meta_key, 'rank_math_schema_' ) || strlen( $meta_key ) <= strlen( 'rank_math_schema_' ) ) {
-			return new \WP_Error( 'crayn_safe_bad_meta_key', 'meta_key must look like rank_math_schema_<Type>.' );
+			return new \WP_Error( 'craynai_bad_meta_key', 'meta_key must look like rank_math_schema_<Type>.' );
 		}
 		$only = isset( $input['meta_id'] ) ? (int) $input['meta_id'] : null;
 
 		$raw_before = self::raw_snapshot( $post_id );
 		if ( empty( $raw_before[ $meta_key ] ) ) {
-			return new \WP_Error( 'crayn_safe_schema_not_found', sprintf( 'Post %d has no "%s" schema.', $post_id, $meta_key ) );
+			return new \WP_Error( 'craynai_schema_not_found', sprintf( 'Post %d has no "%s" schema.', $post_id, $meta_key ) );
 		}
 
 		if ( $dry_run ) {
@@ -1444,7 +1444,7 @@ class RankMathAbilities extends AbilitiesBase {
 				$ids      = array_map( 'intval', (array) $wpdb->get_col( $wpdb->prepare( "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s ORDER BY meta_id ASC", $post_id, $meta_key ) ) );
 				$position = array_search( $only, $ids, true );
 				if ( false === $position ) {
-					return new \WP_Error( 'crayn_safe_schema_not_found', 'No matching schema row would be removed (check meta_id).' );
+					return new \WP_Error( 'craynai_schema_not_found', 'No matching schema row would be removed (check meta_id).' );
 				}
 				$left = $raw_before[ $meta_key ];
 				array_splice( $left, (int) $position, 1 );
@@ -1465,12 +1465,12 @@ class RankMathAbilities extends AbilitiesBase {
 
 		$deleted = self::delete_schema_rows( $post_id, $meta_key, $only );
 		if ( 0 === $deleted ) {
-			return new \WP_Error( 'crayn_safe_schema_not_found', 'No matching schema row was removed (check meta_id).' );
+			return new \WP_Error( 'craynai_schema_not_found', 'No matching schema row was removed (check meta_id).' );
 		}
 
 		$raw_after     = self::raw_snapshot( $post_id );
 		list( $b, $a ) = self::log_payloads( $post_id, $raw_before, $raw_after );
-		$change_id     = ChangeLogger::log( 'crayn-safe/rankmath-schema-delete', 'rankmath', $post_id, $b, $a, sprintf( '%d "%s" schema row(s) removed from post %d', $deleted, $meta_key, $post_id ) );
+		$change_id     = ChangeLogger::log( 'craynai/rankmath-schema-delete', 'rankmath', $post_id, $b, $a, sprintf( '%d "%s" schema row(s) removed from post %d', $deleted, $meta_key, $post_id ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Schema rows were removed from post %d.', $post_id ) );
 		}
@@ -1496,11 +1496,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_redirect_set() {
 		wp_register_ability(
-			'crayn-safe/rankmath-redirect-set',
+			'craynai/rankmath-redirect-set',
 			array(
 				'label'               => 'Set Rank Math redirect',
 				'description'         => 'Create or update a Rank Math redirection for the URL of a post (Redirections module). header_code 301/302/307 need url_to; 410/451 do not. Supports dry_run; logged and revertible (a created redirect is moved to the Rank Math trash, an updated one gets its old values back).',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -1540,25 +1540,25 @@ class RankMathAbilities extends AbilitiesBase {
 			return $post;
 		}
 		if ( ! self::redirections_available() ) {
-			return new \WP_Error( 'crayn_safe_redirections_inactive', 'The Rank Math Redirections module is not active.' );
+			return new \WP_Error( 'craynai_redirections_inactive', 'The Rank Math Redirections module is not active.' );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Managing redirects requires the manage_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Managing redirects requires the manage_options capability.' );
 		}
 		$post_id = (int) $post->ID;
 
 		$code   = isset( $input['header_code'] ) ? (int) $input['header_code'] : 301;
 		$status = isset( $input['status'] ) ? (string) $input['status'] : 'active';
 		if ( ! in_array( $code, array( 301, 302, 307, 410, 451 ), true ) ) {
-			return new \WP_Error( 'crayn_safe_bad_header_code', 'header_code must be 301, 302, 307, 410 or 451.' );
+			return new \WP_Error( 'craynai_bad_header_code', 'header_code must be 301, 302, 307, 410 or 451.' );
 		}
 		$url_to = isset( $input['url_to'] ) ? trim( (string) $input['url_to'] ) : '';
 		if ( in_array( $code, array( 301, 302, 307 ), true ) ) {
 			if ( '' === $url_to ) {
-				return new \WP_Error( 'crayn_safe_url_to_required', 'url_to is required for 301/302/307 redirects.' );
+				return new \WP_Error( 'craynai_url_to_required', 'url_to is required for 301/302/307 redirects.' );
 			}
 			if ( preg_match( '#^[a-z][a-z0-9+.-]*:#i', $url_to ) && ! preg_match( '#^https?://#i', $url_to ) ) {
-				return new \WP_Error( 'crayn_safe_bad_url', 'url_to must be an http(s) URL or a path.' );
+				return new \WP_Error( 'craynai_bad_url', 'url_to must be an http(s) URL or a path.' );
 			}
 		} else {
 			$url_to = '';
@@ -1569,7 +1569,7 @@ class RankMathAbilities extends AbilitiesBase {
 			? self::normalize_source( (string) $input['source'] )
 			: self::post_path( $post_id );
 		if ( '' === $path ) {
-			return new \WP_Error( 'crayn_safe_no_source', 'The post has no redirectable URL (plain permalink or front page).' );
+			return new \WP_Error( 'craynai_no_source', 'The post has no redirectable URL (plain permalink or front page).' );
 		}
 
 		$now  = current_time( 'mysql' );
@@ -1583,11 +1583,11 @@ class RankMathAbilities extends AbilitiesBase {
 		);
 		$obj  = \RankMath\Redirections\Redirection::from( $data );
 		if ( ! $obj->has_sources() ) {
-			return new \WP_Error( 'crayn_safe_no_source', 'Rank Math rejected the source pattern of this post.' );
+			return new \WP_Error( 'craynai_no_source', 'Rank Math rejected the source pattern of this post.' );
 		}
 		$destination = (string) $obj->url_to;
 		if ( '' !== $destination && ( trim( $destination, '/' ) === trim( $permalink, '/' ) || trim( $destination, '/' ) === trim( home_url( $path ), '/' ) ) ) {
-			return new \WP_Error( 'crayn_safe_redirect_loop', 'The destination equals the source URL (redirect loop).' );
+			return new \WP_Error( 'craynai_redirect_loop', 'The destination equals the source URL (redirect loop).' );
 		}
 
 		$existing = \RankMath\Redirections\DB::match_redirections_source( maybe_serialize( $obj->sources ) );
@@ -1618,11 +1618,11 @@ class RankMathAbilities extends AbilitiesBase {
 		}
 
 		if ( $obj->is_infinite_loop() ) {
-			return new \WP_Error( 'crayn_safe_redirect_loop', 'Rank Math detected a redirect loop; nothing was written.' );
+			return new \WP_Error( 'craynai_redirect_loop', 'Rank Math detected a redirect loop; nothing was written.' );
 		}
 		$id = $obj->save();
 		if ( ! $id ) {
-			return new \WP_Error( 'crayn_safe_redirect_failed', 'Rank Math could not save the redirection.' );
+			return new \WP_Error( 'craynai_redirect_failed', 'Rank Math could not save the redirection.' );
 		}
 		$after = \RankMath\Redirections\DB::get_redirection_by_id( (int) $id );
 		if ( $after ) {
@@ -1631,7 +1631,7 @@ class RankMathAbilities extends AbilitiesBase {
 
 		$after_log            = is_array( $after ) ? $after : $planned;
 		$after_log['post_id'] = $post_id;
-		$change_id            = ChangeLogger::log( 'crayn-safe/rankmath-redirect-set', 'redirection', (int) $id, $before, $after_log, sprintf( '%s redirect %s for post %d (%s)', $code, $before ? 'updated' : 'created', $post_id, $path ) );
+		$change_id            = ChangeLogger::log( 'craynai/rankmath-redirect-set', 'redirection', (int) $id, $before, $after_log, sprintf( '%s redirect %s for post %d (%s)', $code, $before ? 'updated' : 'created', $post_id, $path ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Redirection %d was saved.', (int) $id ) );
 		}
@@ -1656,15 +1656,15 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	public static function revert_redirect( $redirection_id, $before, array $after ) {
 		if ( ! self::redirections_available() ) {
-			return new \WP_Error( 'crayn_safe_redirections_inactive', 'The Rank Math Redirections module is not active.' );
+			return new \WP_Error( 'craynai_redirections_inactive', 'The Rank Math Redirections module is not active.' );
 		}
 		$post_id = isset( $after['post_id'] ) ? (int) $after['post_id'] : 0;
 		if ( $post_id > 0 && ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit the post of this redirect.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit the post of this redirect.' );
 		}
 		$redirection_id = (int) $redirection_id;
 		if ( $redirection_id <= 0 || ! \RankMath\Redirections\DB::get_redirection_by_id( $redirection_id ) ) {
-			return new \WP_Error( 'crayn_safe_object_gone', 'The redirection no longer exists.' );
+			return new \WP_Error( 'craynai_object_gone', 'The redirection no longer exists.' );
 		}
 
 		if ( empty( $before ) ) {
@@ -1696,11 +1696,11 @@ class RankMathAbilities extends AbilitiesBase {
 	 */
 	private static function register_analyze() {
 		wp_register_ability(
-			'crayn-safe/rankmath-analyze',
+			'craynai/rankmath-analyze',
 			array(
 				'label'               => 'Analyze post with Rank Math',
 				'description'         => 'Read only. Wraps Rank Math\'s own rank-math/analyze-post-content ability (content, metadata and the on-page test list) and adds the stored Rank Math SEO score of the post.',
-				'category'            => 'crayn-seo',
+				'category'            => 'craynai-seo',
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -1738,7 +1738,7 @@ class RankMathAbilities extends AbilitiesBase {
 		}
 		$ability = function_exists( 'wp_get_ability' ) ? wp_get_ability( 'rank-math/analyze-post-content' ) : null;
 		if ( ! $ability ) {
-			return new \WP_Error( 'crayn_safe_ability_missing', 'This Rank Math version does not provide rank-math/analyze-post-content.' );
+			return new \WP_Error( 'craynai_ability_missing', 'This Rank Math version does not provide rank-math/analyze-post-content.' );
 		}
 		$args = array( 'post_id' => (int) $post->ID );
 		if ( isset( $input['keyword'] ) && '' !== (string) $input['keyword'] ) {

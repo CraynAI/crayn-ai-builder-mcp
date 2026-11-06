@@ -17,10 +17,10 @@
  * - Links (href / vc_link params) store `url:...|title:...|target:...` with
  *   rawurlencoded pieces.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 /**
  * Shortcode tree utilities.

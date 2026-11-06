@@ -1,16 +1,16 @@
 <?php
 /**
- * Admin settings page for Crayn Safe MCP.
+ * Admin settings page for Crayn AI Builder MCP.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Settings -> Crayn Safe MCP: category toggles, read-only mode, recent changes
+ * Settings -> Crayn AI Builder MCP: category toggles, read-only mode, recent changes
  * with revert buttons, backups table and the MCP endpoint + client snippet.
  */
 class AdminPage {
@@ -31,7 +31,7 @@ class AdminPage {
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
 		add_action( 'admin_init', array( self::class, 'handle_revert' ) );
 		add_action( 'admin_init', array( self::class, 'settings' ) );
-		add_filter( 'plugin_action_links_' . plugin_basename( CRAYN_SAFE_MCP_FILE ), array( self::class, 'action_links' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( CRAYN_AI_BUILDER_MCP_FILE ), array( self::class, 'action_links' ) );
 	}
 
 	/**
@@ -45,8 +45,8 @@ class AdminPage {
 			$links,
 			sprintf(
 				'<a href="%s">%s</a>',
-				esc_url( admin_url( 'options-general.php?page=crayn-safe-mcp' ) ),
-				esc_html__( 'Settings', 'crayn-safe-mcp' )
+				esc_url( admin_url( 'options-general.php?page=crayn-ai-builder-mcp' ) ),
+				esc_html__( 'Settings', 'crayn-ai-builder-mcp' )
 			)
 		);
 		return $links;
@@ -59,10 +59,10 @@ class AdminPage {
 	 */
 	public static function menu() {
 		self::$hook = add_options_page(
-			__( 'Crayn Safe MCP', 'crayn-safe-mcp' ),
-			__( 'Crayn Safe MCP', 'crayn-safe-mcp' ),
+			__( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ),
+			__( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ),
 			'manage_options',
-			'crayn-safe-mcp',
+			'crayn-ai-builder-mcp',
 			array( self::class, 'render' )
 		);
 	}
@@ -74,7 +74,7 @@ class AdminPage {
 	 */
 	public static function settings() {
 		register_setting(
-			'crayn_safe_mcp',
+			'crayn_ai_builder_mcp',
 			Settings::OPTION_NAME,
 			array(
 				'sanitize_callback' => array( Settings::class, 'sanitize' ),
@@ -89,24 +89,24 @@ class AdminPage {
 	 * @return void
 	 */
 	public static function handle_revert() {
-		if ( ! isset( $_POST['crayn_safe_revert'], $_POST['crayn_safe_revert_id'] ) ) {
+		if ( ! isset( $_POST['craynai_revert'], $_POST['craynai_revert_id'] ) ) {
 			return;
 		}
-		if ( ! check_admin_referer( 'crayn_safe_revert' ) ) {
+		if ( ! check_admin_referer( 'craynai_revert' ) ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$change_id = isset( $_POST['crayn_safe_revert_id'] ) ? absint( $_POST['crayn_safe_revert_id'] ) : 0;
+		$change_id = isset( $_POST['craynai_revert_id'] ) ? absint( $_POST['craynai_revert_id'] ) : 0;
 		$result    = ChangeAbilities::revert( $change_id );
 
-		$redirect = remove_query_arg( array( 'crayn_reverted', 'crayn_revert_error' ), wp_get_referer() );
+		$redirect = remove_query_arg( array( 'craynai_reverted', 'craynai_revert_error' ), wp_get_referer() );
 		if ( is_wp_error( $result ) ) {
-			$redirect = add_query_arg( 'crayn_revert_error', rawurlencode( $result->get_error_message() ), $redirect );
+			$redirect = add_query_arg( 'craynai_revert_error', rawurlencode( $result->get_error_message() ), $redirect );
 		} else {
-			$redirect = add_query_arg( 'crayn_reverted', $change_id, $redirect );
+			$redirect = add_query_arg( 'craynai_reverted', $change_id, $redirect );
 		}
 
 		wp_safe_redirect( $redirect );
@@ -124,35 +124,44 @@ class AdminPage {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Crayn Safe MCP', 'crayn-safe-mcp' ); ?></h1>
+			<h1><?php esc_html_e( 'Crayn AI Builder MCP', 'crayn-ai-builder-mcp' ); ?></h1>
 			<p class="description">
-				<?php esc_html_e( 'Every write is previewable (dry run), logged with a before/after snapshot and revertible. Plugin updates take a backup first and roll back automatically if the site breaks.', 'crayn-safe-mcp' ); ?>
+				<?php
+				printf(
+					/* translators: %s: developer name. */
+					esc_html__( 'Developed by %s', 'crayn-ai-builder-mcp' ),
+					'Yunus Doğukan OĞLAKCI (CraynAI)'
+				);
+				?>
+			</p>
+			<p class="description">
+				<?php esc_html_e( 'Every write is previewable (dry run), logged with a before/after snapshot and revertible. Plugin updates take a backup first and roll back automatically if the site breaks.', 'crayn-ai-builder-mcp' ); ?>
 			</p>
 
 			<?php
-			if ( isset( $_GET['crayn_reverted'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flag set by the admin revert link; informs, does not decide.
+			if ( isset( $_GET['craynai_reverted'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flag set by the admin revert link; informs, does not decide.
 				printf(
 					'<div class="notice notice-success"><p>%s</p></div>',
-					esc_html( sprintf( /* translators: %d: change id. */ __( 'Change %d was reverted successfully.', 'crayn-safe-mcp' ), absint( isset( $_GET['crayn_reverted'] ) ? wp_unslash( $_GET['crayn_reverted'] ) : '' ) ) ) ) ;
+					esc_html( sprintf( /* translators: %d: change id. */ __( 'Change %d was reverted successfully.', 'crayn-ai-builder-mcp' ), absint( isset( $_GET['craynai_reverted'] ) ? wp_unslash( $_GET['craynai_reverted'] ) : '' ) ) ) ) ;
 			}
-			if ( isset( $_GET['crayn_revert_error'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flag set by the admin revert link; informs, does not decide.
+			if ( isset( $_GET['craynai_revert_error'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flag set by the admin revert link; informs, does not decide.
 				printf(
 					'<div class="notice notice-error"><p>%s</p></div>',
-					esc_html( sanitize_text_field( wp_unslash( $_GET['crayn_revert_error'] ) ) )
+					esc_html( sanitize_text_field( wp_unslash( $_GET['craynai_revert_error'] ) ) )
 				);
 			}
 
 			if ( ! class_exists( 'WP\MCP\Core\McpAdapter' ) ) {
 				printf(
 					'<div class="notice notice-error"><p>%s</p></div>',
-					esc_html__( 'The MCP Adapter is not active. The bundled copy loads together with this plugin, but check that the vendor/ directory exists (composer install).', 'crayn-safe-mcp' )
+					esc_html__( 'The MCP Adapter is not active. The bundled copy loads together with this plugin, but check that the vendor/ directory exists (composer install).', 'crayn-ai-builder-mcp' )
 				);
 			}
 			?>
 
 			<form method="post" action="options.php">
-				<?php settings_fields( 'crayn_safe_mcp' ); ?>
-				<h2><?php esc_html_e( 'Enabled categories', 'crayn-safe-mcp' ); ?></h2>
+				<?php settings_fields( 'crayn_ai_builder_mcp' ); ?>
+				<h2><?php esc_html_e( 'Enabled categories', 'crayn-ai-builder-mcp' ); ?></h2>
 				<table class="form-table" role="presentation">
 					<?php foreach ( Settings::categories() as $slug => $label ) : ?>
 						<tr>
@@ -161,28 +170,28 @@ class AdminPage {
 								<label>
 									<input type="checkbox" name="<?php echo esc_attr( Settings::OPTION_NAME ); ?>[enabled_categories][<?php echo esc_attr( $slug ); ?>]" value="1"
 										<?php checked( Settings::category_enabled( $slug ) ); ?> />
-									<?php esc_html_e( 'Expose these abilities (and their MCP tools)', 'crayn-safe-mcp' ); ?>
+									<?php esc_html_e( 'Expose these abilities (and their MCP tools)', 'crayn-ai-builder-mcp' ); ?>
 								</label>
 							</td>
 						</tr>
 					<?php endforeach; ?>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Read-only mode', 'crayn-safe-mcp' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Read-only mode', 'crayn-ai-builder-mcp' ); ?></th>
 						<td>
 							<label>
 								<input type="checkbox" name="<?php echo esc_attr( Settings::OPTION_NAME ); ?>[read_only]" value="1"
 									<?php checked( Settings::read_only() ); ?> />
-								<?php esc_html_e( 'When enabled, every write ability returns an error (reads and dry runs still work).', 'crayn-safe-mcp' ); ?>
+								<?php esc_html_e( 'When enabled, every write ability returns an error (reads and dry runs still work).', 'crayn-ai-builder-mcp' ); ?>
 							</label>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Rank Math / Yoast abilities', 'crayn-safe-mcp' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Rank Math / Yoast abilities', 'crayn-ai-builder-mcp' ); ?></th>
 						<td>
 							<label>
 								<input type="checkbox" name="<?php echo esc_attr( Settings::OPTION_NAME ); ?>[external_abilities]" value="1"
 									<?php checked( Settings::external_abilities() ); ?> />
-								<?php esc_html_e( 'Also list the abilities of Rank Math and Yoast SEO as tools (up to about 40 more, which makes the tool list much larger). Read-only ones are listed directly; writing ones only through safe wrappers (dry run, option snapshot, change log, revert). Off by default; the built-in SEO and Rank Math tools work either way.', 'crayn-safe-mcp' ); ?>
+								<?php esc_html_e( 'Also list the abilities of Rank Math and Yoast SEO as tools (up to about 40 more, which makes the tool list much larger). Read-only ones are listed directly; writing ones only through safe wrappers (dry run, option snapshot, change log, revert). Off by default; the built-in SEO and Rank Math tools work either way.', 'crayn-ai-builder-mcp' ); ?>
 							</label>
 						</td>
 					</tr>
@@ -191,26 +200,26 @@ class AdminPage {
 			</form>
 
 			<hr />
-			<h2><?php esc_html_e( 'MCP endpoint', 'crayn-safe-mcp' ); ?></h2>
+			<h2><?php esc_html_e( 'MCP endpoint', 'crayn-ai-builder-mcp' ); ?></h2>
 			<?php
-			$endpoint = rest_url( 'crayn-safe/v1/mcp' );
+			$endpoint = rest_url( 'craynai/v1/mcp' );
 			$user     = wp_get_current_user();
 			?>
 			<p>
 				<input type="text" readonly class="large-text code" onclick="this.select()" value="<?php echo esc_attr( $endpoint ); ?>" />
 			</p>
 			<p class="description">
-				<?php esc_html_e( 'Create a WordPress Application Password (Users > Profile) and use Basic authentication with your username and the generated password. Or point clients at the default discovery server: ', 'crayn-safe-mcp' ); ?>
+				<?php esc_html_e( 'Create a WordPress Application Password (Users > Profile) and use Basic authentication with your username and the generated password. Or point clients at the default discovery server: ', 'crayn-ai-builder-mcp' ); ?>
 				<code><?php echo esc_html( rest_url( 'mcp/mcp-adapter-default-server' ) ); ?></code>
 			</p>
 
-			<h3><?php esc_html_e( 'Claude Desktop / Claude Code / Cursor config snippet', 'crayn-safe-mcp' ); ?></h3>
+			<h3><?php esc_html_e( 'Claude Desktop / Claude Code / Cursor config snippet', 'crayn-ai-builder-mcp' ); ?></h3>
 			<?php
 			$auth = base64_encode( $user->user_login . ':' . str_repeat( 'X', 12 ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Example placeholder credentials only.
 			$snippet = json_encode(
 				array(
 					'mcpServers' => array(
-						'crayn-safe' => array(
+						'craynai' => array(
 							'url'     => $endpoint,
 							'headers' => array(
 								'Authorization' => 'Basic ' . $auth,
@@ -222,12 +231,12 @@ class AdminPage {
 			);
 			?>
 			<textarea readonly rows="10" class="large-text code" onclick="this.select()"
-				aria-label="<?php esc_attr_e( 'Client configuration snippet', 'crayn-safe-mcp' ); ?>"><?php echo esc_textarea( $snippet ); ?></textarea>
+				aria-label="<?php esc_attr_e( 'Client configuration snippet', 'crayn-ai-builder-mcp' ); ?>"><?php echo esc_textarea( $snippet ); ?></textarea>
 			<p class="description">
 			<?php
 			printf(
 				/* translators: 1: current username, 2: base64 marker. */
-				esc_html__( 'Replace the Authorization value with a real token: it is the base64 encoding of "username:application-password". Your username is %1$s. The snippet above already contains the correct endpoint; the credentials are a placeholder ending in %2$s.', 'crayn-safe-mcp' ),
+				esc_html__( 'Replace the Authorization value with a real token: it is the base64 encoding of "username:application-password". Your username is %1$s. The snippet above already contains the correct endpoint; the credentials are a placeholder ending in %2$s.', 'crayn-ai-builder-mcp' ),
 				'<code>' . esc_html( $user->user_login ) . '</code>',
 				'<code>XXXXXXXXXXXX</code>'
 			);
@@ -235,19 +244,19 @@ class AdminPage {
 			</p>
 
 			<hr />
-			<h2><?php esc_html_e( 'Recent changes', 'crayn-safe-mcp' ); ?></h2>
+			<h2><?php esc_html_e( 'Recent changes', 'crayn-ai-builder-mcp' ); ?></h2>
 			<?php if ( Settings::read_only() ) : ?>
-				<p class="description"><?php esc_html_e( 'Read-only mode is ON: writes will fail until it is disabled.', 'crayn-safe-mcp' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Read-only mode is ON: writes will fail until it is disabled.', 'crayn-ai-builder-mcp' ); ?></p>
 			<?php endif; ?>
 			<table class="widefat striped">
 				<thead>
 					<tr>
-						<th><?php esc_html_e( 'Change', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Date (UTC)', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'User', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Object', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Note', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Action', 'crayn-safe-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Change', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Date (UTC)', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'User', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Object', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Note', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Action', 'crayn-ai-builder-mcp' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -255,7 +264,7 @@ class AdminPage {
 					$rows = ChangeLogger::list_changes( array( 'limit' => 25 ) );
 					if ( empty( $rows ) ) :
 						?>
-						<tr><td colspan="6"><?php esc_html_e( 'No changes logged yet.', 'crayn-safe-mcp' ); ?></td></tr>
+						<tr><td colspan="6"><?php esc_html_e( 'No changes logged yet.', 'crayn-ai-builder-mcp' ); ?></td></tr>
 						<?php
 					endif;
 
@@ -269,14 +278,14 @@ class AdminPage {
 							<td><?php echo esc_html( $row['note'] ); ?></td>
 							<td>
 								<?php if ( empty( $row['reverted_at'] ) ) : ?>
-									<form method="post" onsubmit="return confirm('<?php echo esc_js( __( 'Restore this change? The change log keeps only one snapshot, reverting twice is blocked.', 'crayn-safe-mcp' ) ); ?>');">
-										<?php wp_nonce_field( 'crayn_safe_revert' ); ?>
-										<input type="hidden" name="crayn_safe_revert" value="1" />
-										<input type="hidden" name="crayn_safe_revert_id" value="<?php echo esc_attr( (int) $row['id'] ); ?>" />
-										<input type="submit" class="button button-small" value="<?php esc_attr_e( 'Revert', 'crayn-safe-mcp' ); ?>" />
+									<form method="post" onsubmit="return confirm('<?php echo esc_js( __( 'Restore this change? The change log keeps only one snapshot, reverting twice is blocked.', 'crayn-ai-builder-mcp' ) ); ?>');">
+										<?php wp_nonce_field( 'craynai_revert' ); ?>
+										<input type="hidden" name="craynai_revert" value="1" />
+										<input type="hidden" name="craynai_revert_id" value="<?php echo esc_attr( (int) $row['id'] ); ?>" />
+										<input type="submit" class="button button-small" value="<?php esc_attr_e( 'Revert', 'crayn-ai-builder-mcp' ); ?>" />
 									</form>
 								<?php else : ?>
-									<span title="<?php echo esc_attr( $row['reverted_at'] ); ?>"><?php esc_html_e( 'Reverted', 'crayn-safe-mcp' ); ?></span>
+									<span title="<?php echo esc_attr( $row['reverted_at'] ); ?>"><?php esc_html_e( 'Reverted', 'crayn-ai-builder-mcp' ); ?></span>
 								<?php endif; ?>
 							</td>
 						</tr>
@@ -285,15 +294,15 @@ class AdminPage {
 			</table>
 
 			<hr />
-			<h2><?php esc_html_e( 'Plugin backups', 'crayn-safe-mcp' ); ?></h2>
+			<h2><?php esc_html_e( 'Plugin backups', 'crayn-ai-builder-mcp' ); ?></h2>
 			<table class="widefat striped">
 				<thead>
 					<tr>
-						<th><?php esc_html_e( 'File', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Plugin', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Version', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Size', 'crayn-safe-mcp' ); ?></th>
-						<th><?php esc_html_e( 'Created at', 'crayn-safe-mcp' ); ?></th>
+						<th><?php esc_html_e( 'File', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Plugin', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Version', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Size', 'crayn-ai-builder-mcp' ); ?></th>
+						<th><?php esc_html_e( 'Created at', 'crayn-ai-builder-mcp' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -301,7 +310,7 @@ class AdminPage {
 					$backups = PluginBackup::list_backups();
 					if ( empty( $backups ) ) :
 						?>
-						<tr><td colspan="5"><?php esc_html_e( 'No backups yet. Each plugin update creates one automatically.', 'crayn-safe-mcp' ); ?></td></tr>
+						<tr><td colspan="5"><?php esc_html_e( 'No backups yet. Each plugin update creates one automatically.', 'crayn-ai-builder-mcp' ); ?></td></tr>
 						<?php
 					endif;
 					foreach ( $backups as $backup ) :
@@ -317,7 +326,7 @@ class AdminPage {
 				</tbody>
 			</table>
 			<p class="description">
-				<?php esc_html_e( 'Backups live in wp-content/crayn-safe-backups/plugins/, protected with .htaccess deny rules. Old backups can be used via the plugin-rollback tool.', 'crayn-safe-mcp' ); ?>
+				<?php esc_html_e( 'Backups live in wp-content/craynai-backups/plugins/, protected with .htaccess deny rules. Old backups can be used via the plugin-rollback tool.', 'crayn-ai-builder-mcp' ); ?>
 			</p>
 		</div>
 		<?php

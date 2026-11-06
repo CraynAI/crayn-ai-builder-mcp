@@ -2,15 +2,15 @@
 /**
  * SEO abilities with auto-detected Rank Math / Yoast support.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers "crayn-seo" abilities. Reads/writes the SEO plugin meta fields of a
+ * Registers "craynai-seo" abilities. Reads/writes the SEO plugin meta fields of a
  * post and logs old values so seo-update can be reverted.
  */
 class SeoAbilities extends AbilitiesBase {
@@ -22,8 +22,8 @@ class SeoAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		$names = array(
-			'crayn-safe/seo-get',
-			'crayn-safe/seo-update',
+			'craynai/seo-get',
+			'craynai/seo-update',
 		);
 		if ( RankMathAbilities::is_active() ) {
 			$names = array_merge( $names, RankMathAbilities::ability_names() );
@@ -63,8 +63,8 @@ class SeoAbilities extends AbilitiesBase {
 	 */
 	private static function no_plugin_error() {
 		return new \WP_Error(
-			'crayn_safe_no_seo_plugin',
-			__( 'No supported SEO plugin detected. Crayn Safe MCP supports Rank Math and Yoast SEO; install and activate one of them.', 'crayn-safe-mcp' )
+			'craynai_no_seo_plugin',
+			__( 'No supported SEO plugin detected. Crayn AI Builder MCP supports Rank Math and Yoast SEO; install and activate one of them.', 'crayn-ai-builder-mcp' )
 		);
 	}
 
@@ -193,17 +193,17 @@ class SeoAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/seo-get
+	 * craynai/seo-get
 	 *
 	 * @return void
 	 */
 	private static function register_seo_get() {
 		wp_register_ability(
-			'crayn-safe/seo-get',
+			'craynai/seo-get',
 			array(
 				'label'              => 'Get SEO data',
 				'description'        => 'Get SEO fields of a post from the active SEO plugin (Rank Math or Yoast): title, description, focus keyword, canonical URL and robots directives.',
-				'category'           => 'crayn-seo',
+				'category'           => 'craynai-seo',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -240,7 +240,7 @@ class SeoAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_seo_get( $input ) {
-		$guard = Safety::guard( 'crayn-seo', false );
+		$guard = Safety::guard( 'craynai-seo', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -253,10 +253,10 @@ class SeoAbilities extends AbilitiesBase {
 		$post_id = isset( $input['post_id'] ) ? (int) $input['post_id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot access this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot access this post.' );
 		}
 
 		$values = self::robots_out( $post_id, $plugin );
@@ -268,17 +268,17 @@ class SeoAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * crayn-safe/seo-update
+	 * craynai/seo-update
 	 *
 	 * @return void
 	 */
 	private static function register_seo_update() {
 		wp_register_ability(
-			'crayn-safe/seo-update',
+			'craynai/seo-update',
 			array(
 				'label'              => 'Update SEO data',
 				'description'        => 'Update SEO fields of a post in the active SEO plugin (Rank Math or Yoast): title, description, focus keyword, canonical URL, robots directives. Old values are logged with the change and can be reverted via change-revert.',
-				'category'           => 'crayn-seo',
+				'category'           => 'craynai-seo',
 				'input_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -316,7 +316,7 @@ class SeoAbilities extends AbilitiesBase {
 	 */
 	public static function execute_seo_update( $input ) {
 		$dry_run = Safety::dry_run( $input );
-		$guard   = Safety::guard( 'crayn-seo', true, $dry_run );
+		$guard   = Safety::guard( 'craynai-seo', true, $dry_run );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -329,10 +329,10 @@ class SeoAbilities extends AbilitiesBase {
 		$post_id = isset( $input['post_id'] ) ? (int) $input['post_id'] : 0;
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 
 		$before = self::robots_out( $post_id, $plugin );
@@ -353,7 +353,7 @@ class SeoAbilities extends AbilitiesBase {
 			if ( '' !== $canonical ) {
 				$canonical = esc_url_raw( $canonical );
 				if ( '' === $canonical ) {
-					return new \WP_Error( 'crayn_safe_invalid_canonical', 'The canonical value must be a valid http/https URL.' );
+					return new \WP_Error( 'craynai_invalid_canonical', 'The canonical value must be a valid http/https URL.' );
 				}
 			}
 			$after['canonical'] = $canonical;
@@ -390,7 +390,7 @@ class SeoAbilities extends AbilitiesBase {
 		}
 
 		$change_id = ChangeLogger::log(
-			'crayn-safe/seo-update',
+			'craynai/seo-update',
 			'seo',
 			$post_id,
 			array_merge( array( 'plugin' => $plugin ), $before, array( 'raw' => $raw_before ) ),
@@ -531,13 +531,13 @@ class SeoAbilities extends AbilitiesBase {
 	public static function restore_snapshot( $post_id, array $before ) {
 		$plugin = isset( $before['plugin'] ) ? (string) $before['plugin'] : '';
 		if ( '' === $plugin ) {
-			return new \WP_Error( 'crayn_safe_no_seo_snapshot', 'The change log has no SEO snapshot for this change.' );
+			return new \WP_Error( 'craynai_no_seo_snapshot', 'The change log has no SEO snapshot for this change.' );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this post.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this post.' );
 		}
 		if ( $plugin !== self::detected_plugin() ) {
-			return new \WP_Error( 'crayn_safe_seo_plugin_changed', 'The active SEO plugin differs from the one recorded in the snapshot; refusing to restore.' );
+			return new \WP_Error( 'craynai_seo_plugin_changed', 'The active SEO plugin differs from the one recorded in the snapshot; refusing to restore.' );
 		}
 
 		if ( isset( $before['raw'] ) && is_array( $before['raw'] ) ) {
@@ -586,7 +586,7 @@ class SeoAbilities extends AbilitiesBase {
 	public static function permission_read( $input = array() ) {
 		$post_id = self::input_post_id( $input );
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-seo', false );
+		return $can && null === Safety::guard( 'craynai-seo', false );
 	}
 
 	/**
@@ -598,6 +598,6 @@ class SeoAbilities extends AbilitiesBase {
 	public static function permission_write( $input = array() ) {
 		$post_id = self::input_post_id( $input );
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-seo', false );
+		return $can && null === Safety::guard( 'craynai-seo', false );
 	}
 }

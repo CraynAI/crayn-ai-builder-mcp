@@ -1,23 +1,23 @@
 <?php
 /**
- * Settings storage for Crayn Safe MCP.
+ * Settings storage for Crayn AI Builder MCP.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Manages the plugin option `crayn_safe_mcp_settings`.
+ * Manages the plugin option `crayn_ai_builder_mcp_settings`.
  */
 class Settings {
 
 	/**
 	 * Option name.
 	 */
-	const OPTION_NAME = 'crayn_safe_mcp_settings';
+	const OPTION_NAME = 'crayn_ai_builder_mcp_settings';
 
 	/**
 	 * All category slugs with labels.
@@ -26,11 +26,11 @@ class Settings {
 	 */
 	public static function categories() {
 		return array(
-			'content' => __( 'Content (posts, media, terms)', 'crayn-safe-mcp' ),
-			'seo'     => __( 'SEO (Rank Math / Yoast fields)', 'crayn-safe-mcp' ),
-			'plugins' => __( 'Plugins (list, update, activate, rollback)', 'crayn-safe-mcp' ),
-			'site'    => __( 'Site health (read only)', 'crayn-safe-mcp' ),
-			'settings' => __( 'Site settings and menus (allow-listed options, navigation menus)', 'crayn-safe-mcp' ),
+			'content' => __( 'Content (posts, media, terms)', 'crayn-ai-builder-mcp' ),
+			'seo'     => __( 'SEO (Rank Math / Yoast fields)', 'crayn-ai-builder-mcp' ),
+			'plugins' => __( 'Plugins (list, update, activate, rollback)', 'crayn-ai-builder-mcp' ),
+			'site'    => __( 'Site health (read only)', 'crayn-ai-builder-mcp' ),
+			'settings' => __( 'Site settings and menus (allow-listed options, navigation menus)', 'crayn-ai-builder-mcp' ),
 		);
 	}
 
@@ -68,7 +68,7 @@ class Settings {
 	 */
 	public static function category_enabled( $category ) {
 		$all      = self::all();
-		$category = preg_replace( '/^crayn-/', '', (string) $category );
+		$category = preg_replace( '/^craynai-/', '', (string) $category );
 		return in_array( $category, (array) $all['enabled_categories'], true );
 	}
 

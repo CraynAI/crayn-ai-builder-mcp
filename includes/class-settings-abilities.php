@@ -5,19 +5,19 @@
  * Allow-list only: an option name that is not in the list is refused and never
  * written, whatever the input says. A deny-list (siteurl, home, admin_email,
  * keys, passwords, roles, active plugins, theme ...) always wins, also over the
- * "crayn_safe_mcp_settings_allowlist" filter. Updates are atomic (all values are
+ * "crayn_ai_builder_mcp_settings_allowlist" filter. Updates are atomic (all values are
  * validated first), logged with the old value of every option and reverted
  * through SettingsAbilities::revert().
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers "crayn-safe/settings-get" and "crayn-safe/settings-update".
+ * Registers "craynai/settings-get" and "craynai/settings-update".
  */
 class SettingsAbilities extends AbilitiesBase {
 
@@ -84,8 +84,8 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/settings-get',
-			'crayn-safe/settings-update',
+			'craynai/settings-get',
+			'craynai/settings-update',
 		);
 	}
 
@@ -96,11 +96,11 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	public static function register() {
 		wp_register_ability(
-			'crayn-safe/settings-get',
+			'craynai/settings-get',
 			array(
 				'label'               => 'Get site settings',
 				'description'         => 'Read site settings from a fixed allow-list (title, tagline, timezone, date/time format, language, reading, comments, permalinks, media sizes ...). Without "names" every allowed option is returned with its value and its type/limits; with "names" only those. Options outside the allow-list (and the deny-listed secrets, URLs and roles) are refused.',
-				'category'            => 'crayn-settings',
+				'category'            => 'craynai-settings',
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -141,11 +141,11 @@ class SettingsAbilities extends AbilitiesBase {
 		);
 
 		wp_register_ability(
-			'crayn-safe/settings-update',
+			'craynai/settings-update',
 			array(
 				'label'               => 'Update site settings',
 				'description'         => 'Change several allow-listed site settings in one atomic call: every value is validated first and one bad value refuses the whole call. The old value of every option is logged and reverted together with change-revert. Setting blog_public to 0 (hide from search engines) or changing permalink_structure returns a "warning"; permalink_structure/category_base/tag_base flush the rewrite rules. Options that are not allow-listed are refused, never written. Accepts dry_run; logged with change_id.',
-				'category'            => 'crayn-settings',
+				'category'            => 'craynai-settings',
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -177,7 +177,7 @@ class SettingsAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission( $input = array() ) {
-		return current_user_can( 'manage_options' ) && null === Safety::guard( 'crayn-settings', false );
+		return current_user_can( 'manage_options' ) && null === Safety::guard( 'craynai-settings', false );
 	}
 
 	// ---------------------------------------------------------------------
@@ -239,7 +239,7 @@ class SettingsAbilities extends AbilitiesBase {
 
 	/**
 	 * The effective allow-list: the built-in one after the
-	 * "crayn_safe_mcp_settings_allowlist" filter. The filter receives name => spec and may
+	 * "crayn_ai_builder_mcp_settings_allowlist" filter. The filter receives name => spec and may
 	 * (a) remove entries, (b) add entries for options that WordPress core does not own, with a
 	 * simple spec (type string|int|flag|enum|number + limits). It can never change a core
 	 * entry's spec, and the deny-list always wins.
@@ -248,7 +248,7 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	public static function allowlist() {
 		$core     = self::core_allowlist();
-		$filtered = apply_filters( 'crayn_safe_mcp_settings_allowlist', $core );
+		$filtered = apply_filters( 'crayn_ai_builder_mcp_settings_allowlist', $core );
 		if ( ! is_array( $filtered ) ) {
 			$filtered = $core;
 		}
@@ -340,13 +340,13 @@ class SettingsAbilities extends AbilitiesBase {
 	private static function access_error( $name, array $allow ) {
 		if ( self::is_denied( $name ) ) {
 			return new \WP_Error(
-				'crayn_safe_option_denied',
+				'craynai_option_denied',
 				sprintf( 'Option "%s" can never be changed with this tool. Always denied: %s.', $name, self::DENIED_LABEL )
 			);
 		}
 		if ( ! isset( $allow[ $name ] ) ) {
 			return new \WP_Error(
-				'crayn_safe_option_not_allowed',
+				'craynai_option_not_allowed',
 				sprintf( 'Option "%s" is not in the allow-list, so it was not touched. Allowed options: %s. Always denied: %s.', $name, implode( ', ', array_keys( $allow ) ), self::DENIED_LABEL )
 			);
 		}
@@ -364,7 +364,7 @@ class SettingsAbilities extends AbilitiesBase {
 	 * @return array{exists:bool,value:?string}
 	 */
 	private static function snapshot_option( $name ) {
-		$missing = '__crayn_safe_missing__' . wp_generate_password( 12, false );
+		$missing = '__craynai_missing__' . wp_generate_password( 12, false );
 		$value   = get_option( $name, $missing );
 		if ( $value === $missing ) {
 			return array( 'exists' => false, 'value' => null );
@@ -397,12 +397,12 @@ class SettingsAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_settings_get( $input ) {
-		$guard = Safety::guard( 'crayn-settings', false );
+		$guard = Safety::guard( 'craynai-settings', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Reading site settings requires the manage_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Reading site settings requires the manage_options capability.' );
 		}
 		$allow = self::allowlist();
 		$names = ( isset( $input['names'] ) && is_array( $input['names'] ) && array() !== $input['names'] ) ? array_map( 'strval', $input['names'] ) : array_keys( $allow );
@@ -455,7 +455,7 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	private static function validate_value( $name, $value, array $spec ) {
 		$bad  = static function ( $message ) use ( $name ) {
-			return new \WP_Error( 'crayn_safe_settings_invalid', sprintf( '%s: %s', $name, $message ) );
+			return new \WP_Error( 'craynai_settings_invalid', sprintf( '%s: %s', $name, $message ) );
 		};
 		$type = isset( $spec['type'] ) ? $spec['type'] : 'string';
 
@@ -552,7 +552,7 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	private static function validate_string_check( $name, $text, array $spec ) {
 		$bad   = static function ( $message ) use ( $name ) {
-			return new \WP_Error( 'crayn_safe_settings_invalid', sprintf( '%s: %s', $name, $message ) );
+			return new \WP_Error( 'craynai_settings_invalid', sprintf( '%s: %s', $name, $message ) );
 		};
 		$check = isset( $spec['check'] ) ? $spec['check'] : '';
 
@@ -678,24 +678,24 @@ class SettingsAbilities extends AbilitiesBase {
 	 */
 	public static function execute_settings_update( $input ) {
 		$dry   = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-settings', true, $dry );
+		$guard = Safety::guard( 'craynai-settings', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Changing site settings requires the manage_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Changing site settings requires the manage_options capability.' );
 		}
 		if ( ! isset( $input['values'] ) || ! is_array( $input['values'] ) || array() === $input['values'] ) {
-			return new \WP_Error( 'crayn_safe_values_required', 'Give "values": an object of option name => new value.' );
+			return new \WP_Error( 'craynai_values_required', 'Give "values": an object of option name => new value.' );
 		}
 		$values = $input['values'];
 		if ( array_keys( $values ) === range( 0, count( $values ) - 1 ) ) {
-			return new \WP_Error( 'crayn_safe_values_required', '"values" must be an object of option name => new value, not a list.' );
+			return new \WP_Error( 'craynai_values_required', '"values" must be an object of option name => new value, not a list.' );
 		}
 
 		$allow    = self::allowlist();
 		$problems = array();
-		$code     = 'crayn_safe_settings_invalid';
+		$code     = 'craynai_settings_invalid';
 		$plan     = array();
 
 		foreach ( $values as $name => $value ) {
@@ -703,7 +703,7 @@ class SettingsAbilities extends AbilitiesBase {
 			$error = self::access_error( $name, $allow );
 			if ( null !== $error ) {
 				$problems[] = $error->get_error_message();
-				if ( 'crayn_safe_option_denied' === $error->get_error_code() || 'crayn_safe_settings_invalid' === $code ) {
+				if ( 'craynai_option_denied' === $error->get_error_code() || 'craynai_settings_invalid' === $code ) {
 					$code = $error->get_error_code();
 				}
 				continue;
@@ -774,7 +774,7 @@ class SettingsAbilities extends AbilitiesBase {
 					self::flush_rewrite();
 				}
 				return new \WP_Error(
-					'crayn_safe_settings_write_failed',
+					'craynai_settings_write_failed',
 					sprintf( 'WordPress did not store the requested value of "%s" (it was rejected or altered by a filter). All options of this call were restored to their old values.', $name )
 				);
 			}
@@ -789,7 +789,7 @@ class SettingsAbilities extends AbilitiesBase {
 			$after_real[ $name ] = self::snapshot_option( $name );
 		}
 		$change_id = ChangeLogger::log(
-			'crayn-safe/settings-update',
+			'craynai/settings-update',
 			'settings',
 			0,
 			$before,
@@ -918,7 +918,7 @@ class SettingsAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Restore a logged settings change. Refuses with crayn_safe_revert_conflict
+	 * Restore a logged settings change. Refuses with craynai_revert_conflict
 	 * when any option no longer has the value the change left.
 	 *
 	 * @param array $row Change log row (raw columns).
@@ -928,10 +928,10 @@ class SettingsAbilities extends AbilitiesBase {
 		$before = ChangeLogger::decode( isset( $row['before_data'] ) ? $row['before_data'] : '' );
 		$after  = ChangeLogger::decode( isset( $row['after_data'] ) ? $row['after_data'] : '' );
 		if ( array() === $before || array_keys( $before ) !== array_keys( $after ) ) {
-			return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no complete settings snapshot to restore.' );
+			return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no complete settings snapshot to restore.' );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Reverting settings requires the manage_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Reverting settings requires the manage_options capability.' );
 		}
 
 		$allow = self::allowlist();
@@ -939,15 +939,15 @@ class SettingsAbilities extends AbilitiesBase {
 			$name  = (string) $name;
 			$error = self::access_error( $name, $allow );
 			if ( null !== $error ) {
-				return new \WP_Error( 'crayn_safe_option_not_allowed', 'This change cannot be reverted: ' . $error->get_error_message() );
+				return new \WP_Error( 'craynai_option_not_allowed', 'This change cannot be reverted: ' . $error->get_error_message() );
 			}
 			if ( ! isset( $before[ $name ]['exists'], $after[ $name ]['exists'] ) ) {
-				return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no complete settings snapshot to restore.' );
+				return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no complete settings snapshot to restore.' );
 			}
 			$now = self::snapshot_option( $name );
 			if ( $now['exists'] !== (bool) $after[ $name ]['exists'] || $now['value'] !== $after[ $name ]['value'] ) {
 				return new \WP_Error(
-					'crayn_safe_revert_conflict',
+					'craynai_revert_conflict',
 					sprintf( 'Option "%s" changed after this edit. Revert the newer changes first (see changes-list), newest first.', $name )
 				);
 			}
@@ -958,7 +958,7 @@ class SettingsAbilities extends AbilitiesBase {
 		foreach ( $names as $name ) {
 			$now = self::snapshot_option( $name );
 			if ( $now['exists'] !== (bool) $before[ $name ]['exists'] || $now['value'] !== $before[ $name ]['value'] ) {
-				return new \WP_Error( 'crayn_safe_revert_failed', sprintf( 'Option "%s" did not read back as its old value after the restore (a filter may rewrite it). The change stays marked as not reverted.', $name ) );
+				return new \WP_Error( 'craynai_revert_failed', sprintf( 'Option "%s" did not read back as its old value after the restore (a filter may rewrite it). The change stays marked as not reverted.', $name ) );
 			}
 		}
 		if ( array_intersect( $names, self::REWRITE_OPTIONS ) ) {

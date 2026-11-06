@@ -18,15 +18,15 @@
  * save regenerates (page CSS, element cache, version, template type, the
  * post_content plain-text mirror) is refreshed here the same way.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the "crayn-content" Elementor abilities.
+ * Registers the "craynai-content" Elementor abilities.
  */
 class ElementorAbilities extends AbilitiesBase {
 
@@ -88,16 +88,16 @@ class ElementorAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/elementor-widgets',
-			'crayn-safe/elementor-get',
-			'crayn-safe/elementor-add',
-			'crayn-safe/elementor-update',
-			'crayn-safe/elementor-move',
-			'crayn-safe/elementor-remove',
-			'crayn-safe/elementor-duplicate',
-			'crayn-safe/elementor-replace',
-			'crayn-safe/elementor-page-settings',
-			'crayn-safe/elementor-enable',
+			'craynai/elementor-widgets',
+			'craynai/elementor-get',
+			'craynai/elementor-add',
+			'craynai/elementor-update',
+			'craynai/elementor-move',
+			'craynai/elementor-remove',
+			'craynai/elementor-duplicate',
+			'craynai/elementor-replace',
+			'craynai/elementor-page-settings',
+			'craynai/elementor-enable',
 		);
 	}
 
@@ -222,7 +222,7 @@ class ElementorAbilities extends AbilitiesBase {
 			array(
 				'label'               => $label,
 				'description'         => $description,
-				'category'            => 'crayn-content',
+				'category'            => 'craynai-content',
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => $properties,
@@ -237,15 +237,15 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-widgets.
+	 * Register craynai/elementor-widgets.
 	 *
 	 * @return void
 	 */
 	private static function register_widgets() {
 		self::define(
-			'crayn-safe/elementor-widgets',
+			'craynai/elementor-widgets',
 			'List Elementor widgets',
-			'List the widgets that are registered on this site (name, title, categories) and the layout element types, or, with "name", the controls of one widget (name, type, label, default, options). Search with "search"/"category". Control lists default to the content tab; ask for tab "style" or "advanced" for the rest. V4 atomic widgets are listed (atomic: true) but can only be moved/removed by crayn-safe tools.',
+			'List the widgets that are registered on this site (name, title, categories) and the layout element types, or, with "name", the controls of one widget (name, type, label, default, options). Search with "search"/"category". Control lists default to the content tab; ask for tab "style" or "advanced" for the rest. V4 atomic widgets are listed (atomic: true) but can only be moved/removed by craynai tools.',
 			array(
 				'name'           => array( 'type' => 'string', 'description' => 'Widget name for its controls, e.g. "heading".' ),
 				'search'         => array( 'type' => 'string', 'description' => 'Case-insensitive filter on name/title/keywords.' ),
@@ -274,13 +274,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-get.
+	 * Register craynai/elementor-get.
 	 *
 	 * @return void
 	 */
 	private static function register_get() {
 		self::define(
-			'crayn-safe/elementor-get',
+			'craynai/elementor-get',
 			'Get Elementor page',
 			'Get a post/page and its Elementor state: uses_elementor flag, document type, outline (path, id, type, text preview per element), the full element tree as JSON (decoded; an empty settings object reads as []) and the page settings. Posts that are not built with Elementor are reported with uses_elementor false and an empty tree; no error.',
 			array(
@@ -317,13 +317,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-add.
+	 * Register craynai/elementor-add.
 	 *
 	 * @return void
 	 */
 	private static function register_add() {
 		self::define(
-			'crayn-safe/elementor-add',
+			'craynai/elementor-add',
 			'Add Elementor element',
 			'Add an element (optionally with children) under a parent element id, or at the top level when parent_id is empty. position is 0-based among the siblings, omitted = append. Validates the widget exists and the placement (section > column > widget/inner section; container > widget/container; widgets only inside a container or column). New ids are generated; isInner is computed. Accepts dry_run; logged with change_id.',
 			array(
@@ -341,13 +341,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-update.
+	 * Register craynai/elementor-update.
 	 *
 	 * @return void
 	 */
 	private static function register_update() {
 		self::define(
-			'crayn-safe/elementor-update',
+			'craynai/elementor-update',
 			'Update Elementor element settings',
 			'Merge settings into an element by id: each given key replaces that setting as a whole value (no deep merge); other settings keep their original bytes; keys in remove_settings are dropped. Warns about keys that are not controls of the element. V4 atomic elements are refused. Accepts dry_run; logged with change_id.',
 			array(
@@ -365,13 +365,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-move.
+	 * Register craynai/elementor-move.
 	 *
 	 * @return void
 	 */
 	private static function register_move() {
 		self::define(
-			'crayn-safe/elementor-move',
+			'craynai/elementor-move',
 			'Move Elementor element',
 			'Move an element (with its subtree) under another parent id, or to the top level when parent_id is empty. position is among the new siblings after the element was taken out; omitted = append. Moving into the element itself or its descendants is refused; placement rules apply and isInner follows the new nesting. Works for V4 atomic elements too (the data is moved unchanged). Accepts dry_run; logged with change_id.',
 			array(
@@ -389,13 +389,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-remove.
+	 * Register craynai/elementor-remove.
 	 *
 	 * @return void
 	 */
 	private static function register_remove() {
 		self::define(
-			'crayn-safe/elementor-remove',
+			'craynai/elementor-remove',
 			'Remove Elementor element',
 			'Remove an element (and its children) by id. Nothing is hard deleted: the whole previous data stays in the change log and is fully restorable. Accepts dry_run; logged with change_id.',
 			array(
@@ -411,13 +411,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-duplicate.
+	 * Register craynai/elementor-duplicate.
 	 *
 	 * @return void
 	 */
 	private static function register_duplicate() {
 		self::define(
-			'crayn-safe/elementor-duplicate',
+			'craynai/elementor-duplicate',
 			'Duplicate Elementor element',
 			'Duplicate an element with its whole subtree right after the original, inside the same parent. Every element of the copy gets a fresh unique id. Subtrees with V4 atomic elements are refused (their local style ids are derived from the element ids). Accepts dry_run; logged with change_id.',
 			array(
@@ -433,13 +433,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-replace.
+	 * Register craynai/elementor-replace.
 	 *
 	 * @return void
 	 */
 	private static function register_replace() {
 		self::define(
-			'crayn-safe/elementor-replace',
+			'craynai/elementor-replace',
 			'Replace Elementor page tree',
 			'Replace the whole element tree of a page with the given list (e.g. the "tree" of elementor-get after editing). Existing ids are kept; elements without id get new ones; elements and members that did not change keep their original bytes. Every widget is validated against the registry and the placement rules. V4 atomic elements may only appear unchanged. Use for bulk rewrites; per-element tools are safer. Accepts dry_run; logged with change_id.',
 			array(
@@ -455,13 +455,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-page-settings.
+	 * Register craynai/elementor-page-settings.
 	 *
 	 * @return void
 	 */
 	private static function register_page_settings() {
 		self::define(
-			'crayn-safe/elementor-page-settings',
+			'craynai/elementor-page-settings',
 			'Set Elementor page settings',
 			'Merge values into the Elementor page settings (meta _elementor_page_settings: page layout, background, padding, custom CSS ...) of a page built with Elementor: given keys replace that setting as a whole value, keys in remove_settings are dropped. Settings that Elementor stores on the post itself (post_title, post_status, template, post_excerpt, post_featured_image, menu_order, comment_status) are refused; use the post tools. Clears the generated page CSS; Elementor rebuilds it on the next page view. Accepts dry_run; logged with change_id.',
 			array(
@@ -478,13 +478,13 @@ class ElementorAbilities extends AbilitiesBase {
 	}
 
 	/**
-	 * Register crayn-safe/elementor-enable.
+	 * Register craynai/elementor-enable.
 	 *
 	 * @return void
 	 */
 	private static function register_enable() {
 		self::define(
-			'crayn-safe/elementor-enable',
+			'craynai/elementor-enable',
 			'Enable Elementor for a post',
 			'Turn a post/page into an Elementor page: sets _elementor_edit_mode to "builder", the document type and version, and an empty or existing data meta. Refuses when the post has content and no Elementor data, because the front end would stop showing that content, unless convert_content is true: then the content is put into a text-editor widget (or a shortcode widget when it is only one shortcode), as Elementor does. post_content itself is left untouched. Accepts dry_run; logged with change_id.',
 			array(
@@ -515,7 +515,7 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 		$post_id = ( is_array( $input ) && isset( $input['post_id'] ) ) ? (int) $input['post_id'] : 0;
 		$can     = self::can_edit_post_or_missing( $post_id );
-		return $can && null === Safety::guard( 'crayn-content', false );
+		return $can && null === Safety::guard( 'craynai-content', false );
 	}
 
 	/**
@@ -540,11 +540,11 @@ class ElementorAbilities extends AbilitiesBase {
 	 */
 	private static function runtime_error() {
 		if ( ! class_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance ) || ! is_object( \Elementor\Plugin::$instance ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_not_ready', 'Elementor is not loaded.' );
+			return new \WP_Error( 'craynai_elementor_not_ready', 'Elementor is not loaded.' );
 		}
 		$plugin = \Elementor\Plugin::$instance;
 		if ( empty( $plugin->widgets_manager ) || empty( $plugin->elements_manager ) || empty( $plugin->documents ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_not_ready', 'Elementor is loaded but its widget/element registries are not initialized yet (they are created on "init"). Retry the call.' );
+			return new \WP_Error( 'craynai_elementor_not_ready', 'Elementor is loaded but its widget/element registries are not initialized yet (they are created on "init"). Retry the call.' );
 		}
 		return null;
 	}
@@ -561,14 +561,14 @@ class ElementorAbilities extends AbilitiesBase {
 	private static function get_editable_post( $post_id, $elementor_rules ) {
 		$post_id = (int) $post_id;
 		if ( $post_id <= 0 ) {
-			return new \WP_Error( 'crayn_safe_post_id_required', 'A valid post_id is required.' );
+			return new \WP_Error( 'craynai_post_id_required', 'A valid post_id is required.' );
 		}
 		$post = get_post( $post_id );
 		if ( ! $post instanceof \WP_Post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this content.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this content.' );
 		}
 		if ( $elementor_rules ) {
 			$runtime = self::runtime_error();
@@ -576,10 +576,10 @@ class ElementorAbilities extends AbilitiesBase {
 				return $runtime;
 			}
 			if ( class_exists( '\Elementor\User' ) && ! \Elementor\User::is_current_user_can_edit( $post_id ) ) {
-				return new \WP_Error( 'crayn_safe_elementor_not_editable', 'Elementor does not allow the current user to edit this post (post type not enabled for Elementor, your role is excluded, the post is in the trash, or it is the posts / shop page).' );
+				return new \WP_Error( 'craynai_elementor_not_editable', 'Elementor does not allow the current user to edit this post (post type not enabled for Elementor, your role is excluded, the post is in the trash, or it is the posts / shop page).' );
 			}
 			if ( 'revision' === $post->post_type || 'trash' === $post->post_status ) {
-				return new \WP_Error( 'crayn_safe_elementor_not_editable', 'Revisions and trashed posts cannot be edited.' );
+				return new \WP_Error( 'craynai_elementor_not_editable', 'Revisions and trashed posts cannot be edited.' );
 			}
 		}
 		return $post;
@@ -597,7 +597,7 @@ class ElementorAbilities extends AbilitiesBase {
 		if ( null === $user ) {
 			return null;
 		}
-		return new \WP_Error( 'crayn_safe_elementor_locked', sprintf( 'The page is being edited by %s right now. Try again in a few minutes (the lock expires when they close the editor).', $user ) );
+		return new \WP_Error( 'craynai_elementor_locked', sprintf( 'The page is being edited by %s right now. Try again in a few minutes (the lock expires when they close the editor).', $user ) );
 	}
 
 	/**
@@ -691,7 +691,7 @@ class ElementorAbilities extends AbilitiesBase {
 	 * @return \WP_Error
 	 */
 	private static function not_enabled_error( $post_id ) {
-		return new \WP_Error( 'crayn_safe_elementor_not_enabled', sprintf( 'Post %d is not built with Elementor. Run crayn-safe/elementor-enable first.', (int) $post_id ) );
+		return new \WP_Error( 'craynai_elementor_not_enabled', sprintf( 'Post %d is not built with Elementor. Run craynai/elementor-enable first.', (int) $post_id ) );
 	}
 
 	/**
@@ -893,7 +893,7 @@ class ElementorAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_elementor_widgets( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -908,7 +908,7 @@ class ElementorAbilities extends AbilitiesBase {
 		$name = isset( $input['name'] ) ? trim( (string) $input['name'] ) : '';
 		if ( '' !== $name ) {
 			if ( ! isset( $widgets[ $name ] ) ) {
-				return new \WP_Error( 'crayn_safe_widget_unknown', sprintf( 'Widget "%s" is not registered. List the available names without the "name" argument.', $name ) );
+				return new \WP_Error( 'craynai_widget_unknown', sprintf( 'Widget "%s" is not registered. List the available names without the "name" argument.', $name ) );
 			}
 			$widget = $widgets[ $name ];
 			$tab    = isset( $input['tab'] ) ? strtolower( (string) $input['tab'] ) : 'content';
@@ -1012,7 +1012,7 @@ class ElementorAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error
 	 */
 	public static function execute_elementor_get( $input ) {
-		$guard = Safety::guard( 'crayn-content', false );
+		$guard = Safety::guard( 'craynai-content', false );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -1080,7 +1080,7 @@ class ElementorAbilities extends AbilitiesBase {
 	 * @return array|\WP_Error { post, state, tree }
 	 */
 	private static function begin_write( array $input, $dry ) {
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -1100,7 +1100,7 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 		$tree = self::parse_state( $state );
 		if ( is_string( $tree ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_data_invalid', $tree . ' The page data is left untouched.' );
+			return new \WP_Error( 'craynai_elementor_data_invalid', $tree . ' The page data is left untouched.' );
 		}
 		return array(
 			'post'  => $post,
@@ -1177,7 +1177,7 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 
 		if ( ! self::loggable( $state ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
+			return new \WP_Error( 'craynai_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
 		}
 
 		$write = self::write_data( (int) $post->ID, $new_raw );
@@ -1220,7 +1220,7 @@ class ElementorAbilities extends AbilitiesBase {
 	private static function write_data( $post_id, $raw ) {
 		update_post_meta( $post_id, self::META_DATA, wp_slash( $raw ) ); // False when the value is unchanged; verified by reading back.
 		if ( get_post_meta( $post_id, self::META_DATA, true ) !== $raw ) {
-			return new \WP_Error( 'crayn_safe_elementor_write_failed', sprintf( 'The Elementor data of post %d could not be written (the stored value differs from what was sent).', (int) $post_id ) );
+			return new \WP_Error( 'craynai_elementor_write_failed', sprintf( 'The Elementor data of post %d could not be written (the stored value differs from what was sent).', (int) $post_id ) );
 		}
 		return true;
 	}
@@ -1356,31 +1356,31 @@ class ElementorAbilities extends AbilitiesBase {
 			return $ctx;
 		}
 		if ( ! isset( $input['element'] ) || ! is_array( $input['element'] ) ) {
-			return new \WP_Error( 'crayn_safe_element_required', 'The "element" input is required.' );
+			return new \WP_Error( 'craynai_element_required', 'The "element" input is required.' );
 		}
 		$parent_id = isset( $input['parent_id'] ) ? trim( (string) $input['parent_id'] ) : '';
 		$position  = ( isset( $input['position'] ) && is_numeric( $input['position'] ) ) ? max( 0, (int) $input['position'] ) : null;
 
 		$res = ElementorTree::insert( $ctx['tree'], $parent_id, $position, self::kses_input( $input['element'] ) );
 		if ( is_string( $res ) ) {
-			return new \WP_Error( 'crayn_safe_placement_denied', $res );
+			return new \WP_Error( 'craynai_placement_denied', $res );
 		}
 		$node = ElementorTree::get( $res['tree'], $res['id'] );
 		$path = ElementorTree::find( $res['tree'], $res['id'] );
 		if ( null === $node || null === $path ) {
-			return new \WP_Error( 'crayn_safe_elementor_internal', 'The new element could not be located after the insert.' );
+			return new \WP_Error( 'craynai_elementor_internal', 'The new element could not be located after the insert.' );
 		}
 		$parent_node = null === ElementorTree::parent_id( $res['tree'], $path ) ? null : ElementorTree::get( $res['tree'], (string) ElementorTree::parent_id( $res['tree'], $path ) );
 		$error       = self::validate_subtree( $node, $parent_node, false );
 		if ( null !== $error ) {
-			return new \WP_Error( 'crayn_safe_element_invalid', $error );
+			return new \WP_Error( 'craynai_element_invalid', $error );
 		}
 
 		$extra = array( 'element_id' => $res['id'] );
 		if ( $dry ) {
 			$extra['element'] = ElementorTree::to_array_node( $node );
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $res['tree'], 'crayn-safe/elementor-add', sprintf( 'element %s added under %s', $res['id'], '' === $parent_id ? 'the top level' : $parent_id ), $dry, $extra );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $res['tree'], 'craynai/elementor-add', sprintf( 'element %s added under %s', $res['id'], '' === $parent_id ? 'the top level' : $parent_id ), $dry, $extra );
 	}
 
 	/**
@@ -1398,27 +1398,27 @@ class ElementorAbilities extends AbilitiesBase {
 		$id   = isset( $input['element_id'] ) ? trim( (string) $input['element_id'] ) : '';
 		$node = '' === $id ? null : ElementorTree::get( $ctx['tree'], $id );
 		if ( null === $node ) {
-			return new \WP_Error( 'crayn_safe_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
+			return new \WP_Error( 'craynai_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
 		}
 		if ( ElementorTree::is_atomic( $node ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_atomic_unsupported', sprintf( 'Element "%s" is a V4 atomic element (%s). Its settings are typed props with local styles and cannot be edited with this tool; use the Elementor editor.', $id, 'widget' === $node['elType'] ? $node['widgetType'] : $node['elType'] ) );
+			return new \WP_Error( 'craynai_elementor_atomic_unsupported', sprintf( 'Element "%s" is a V4 atomic element (%s). Its settings are typed props with local styles and cannot be edited with this tool; use the Elementor editor.', $id, 'widget' === $node['elType'] ? $node['widgetType'] : $node['elType'] ) );
 		}
 
 		$set    = ( isset( $input['settings'] ) && is_array( $input['settings'] ) ) ? self::kses_input( $input['settings'] ) : array();
 		$remove = ( isset( $input['remove_settings'] ) && is_array( $input['remove_settings'] ) ) ? array_map( 'strval', $input['remove_settings'] ) : array();
 		if ( array() === $set && array() === $remove ) {
-			return new \WP_Error( 'crayn_safe_nothing_to_do', 'Give "settings" and/or "remove_settings".' );
+			return new \WP_Error( 'craynai_nothing_to_do', 'Give "settings" and/or "remove_settings".' );
 		}
 		if ( array() !== $set && array_keys( $set ) === range( 0, count( $set ) - 1 ) ) {
-			return new \WP_Error( 'crayn_safe_settings_invalid', 'settings must be an object (name => value), not a list.' );
+			return new \WP_Error( 'craynai_settings_invalid', 'settings must be an object (name => value), not a list.' );
 		}
 
 		$warnings = self::unknown_setting_warnings( $node, array_merge( array_keys( $set ), $remove ) );
 		$new      = ElementorTree::update_settings( $ctx['tree'], $id, $set, $remove );
 		if ( is_string( $new ) ) {
-			return new \WP_Error( 'crayn_safe_settings_invalid', $new );
+			return new \WP_Error( 'craynai_settings_invalid', $new );
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'crayn-safe/elementor-update', sprintf( 'settings of element %s updated (%s)', $id, implode( ', ', array_merge( array_map( 'strval', array_keys( $set ) ), array_map( static function ( $k ) { return '-' . $k; }, $remove ) ) ) ), $dry, array(), $warnings );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'craynai/elementor-update', sprintf( 'settings of element %s updated (%s)', $id, implode( ', ', array_merge( array_map( 'strval', array_keys( $set ) ), array_map( static function ( $k ) { return '-' . $k; }, $remove ) ) ) ), $dry, array(), $warnings );
 	}
 
 	/**
@@ -1477,20 +1477,20 @@ class ElementorAbilities extends AbilitiesBase {
 
 		$node = '' === $id ? null : ElementorTree::get( $ctx['tree'], $id );
 		if ( null === $node ) {
-			return new \WP_Error( 'crayn_safe_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
+			return new \WP_Error( 'craynai_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
 		}
 		$new = ElementorTree::move( $ctx['tree'], $id, $parent_id, $position );
 		if ( is_string( $new ) ) {
-			return new \WP_Error( 'crayn_safe_move_failed', $new );
+			return new \WP_Error( 'craynai_move_failed', $new );
 		}
 		if ( '' !== $parent_id ) {
 			$parent_node = ElementorTree::get( $new, $parent_id );
 			$error       = null === $parent_node ? null : self::atomic_parent_error( $node, $parent_node );
 			if ( null !== $error ) {
-				return new \WP_Error( 'crayn_safe_placement_denied', $error );
+				return new \WP_Error( 'craynai_placement_denied', $error );
 			}
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'crayn-safe/elementor-move', sprintf( 'element %s moved to %s', $id, '' === $parent_id ? 'the top level' : $parent_id ), $dry );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'craynai/elementor-move', sprintf( 'element %s moved to %s', $id, '' === $parent_id ? 'the top level' : $parent_id ), $dry );
 	}
 
 	/**
@@ -1507,13 +1507,13 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 		$id = isset( $input['element_id'] ) ? trim( (string) $input['element_id'] ) : '';
 		if ( '' === $id || null === ElementorTree::get( $ctx['tree'], $id ) ) {
-			return new \WP_Error( 'crayn_safe_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
+			return new \WP_Error( 'craynai_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
 		}
 		$new = ElementorTree::remove( $ctx['tree'], $id );
 		if ( is_string( $new ) ) {
-			return new \WP_Error( 'crayn_safe_remove_failed', $new );
+			return new \WP_Error( 'craynai_remove_failed', $new );
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'crayn-safe/elementor-remove', sprintf( 'element %s removed', $id ), $dry );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'craynai/elementor-remove', sprintf( 'element %s removed', $id ), $dry );
 	}
 
 	/**
@@ -1531,16 +1531,16 @@ class ElementorAbilities extends AbilitiesBase {
 		$id   = isset( $input['element_id'] ) ? trim( (string) $input['element_id'] ) : '';
 		$node = '' === $id ? null : ElementorTree::get( $ctx['tree'], $id );
 		if ( null === $node ) {
-			return new \WP_Error( 'crayn_safe_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
+			return new \WP_Error( 'craynai_element_not_found', sprintf( 'Element "%s" does not exist on this page. Use elementor-get for current ids.', $id ) );
 		}
 		if ( ElementorTree::contains_atomic( $node ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_atomic_unsupported', sprintf( 'Element "%s" contains V4 atomic elements. Their local style ids are derived from the element id (modules/atomic-widgets/import-export/modifiers/styles-ids-modifier.php), so a plain copy would share styles with the original. Duplicate it in the Elementor editor.', $id ) );
+			return new \WP_Error( 'craynai_elementor_atomic_unsupported', sprintf( 'Element "%s" contains V4 atomic elements. Their local style ids are derived from the element id (modules/atomic-widgets/import-export/modifiers/styles-ids-modifier.php), so a plain copy would share styles with the original. Duplicate it in the Elementor editor.', $id ) );
 		}
 		$res = ElementorTree::duplicate( $ctx['tree'], $id );
 		if ( is_string( $res ) ) {
-			return new \WP_Error( 'crayn_safe_duplicate_failed', $res );
+			return new \WP_Error( 'craynai_duplicate_failed', $res );
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $res['tree'], 'crayn-safe/elementor-duplicate', sprintf( 'element %s duplicated as %s', $id, $res['id'] ), $dry, array( 'element_id' => $res['id'] ) );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $res['tree'], 'craynai/elementor-duplicate', sprintf( 'element %s duplicated as %s', $id, $res['id'] ), $dry, array( 'element_id' => $res['id'] ) );
 	}
 
 	/**
@@ -1556,19 +1556,19 @@ class ElementorAbilities extends AbilitiesBase {
 			return $ctx;
 		}
 		if ( ! isset( $input['tree'] ) || ! is_array( $input['tree'] ) ) {
-			return new \WP_Error( 'crayn_safe_tree_required', 'The "tree" input (a list of elements) is required.' );
+			return new \WP_Error( 'craynai_tree_required', 'The "tree" input (a list of elements) is required.' );
 		}
 		$new = ElementorTree::from_array( self::kses_input( $input['tree'] ), $ctx['tree'] );
 		if ( is_string( $new ) ) {
-			return new \WP_Error( 'crayn_safe_tree_invalid', $new );
+			return new \WP_Error( 'craynai_tree_invalid', $new );
 		}
 		foreach ( $new['nodes'] as $node ) {
 			$error = self::validate_subtree( $node, null, true );
 			if ( null !== $error ) {
-				return new \WP_Error( 'crayn_safe_element_invalid', $error );
+				return new \WP_Error( 'craynai_element_invalid', $error );
 			}
 		}
-		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'crayn-safe/elementor-replace', 'full element tree replaced', $dry );
+		return self::apply_tree( $ctx['post'], $ctx['state'], $ctx['tree'], $new, 'craynai/elementor-replace', 'full element tree replaced', $dry );
 	}
 
 	// ---------------------------------------------------------------------
@@ -1592,14 +1592,14 @@ class ElementorAbilities extends AbilitiesBase {
 		$set    = ( isset( $input['settings'] ) && is_array( $input['settings'] ) ) ? self::kses_input( $input['settings'] ) : array();
 		$remove = ( isset( $input['remove_settings'] ) && is_array( $input['remove_settings'] ) ) ? array_map( 'strval', $input['remove_settings'] ) : array();
 		if ( array() === $set && array() === $remove ) {
-			return new \WP_Error( 'crayn_safe_nothing_to_do', 'Give "settings" and/or "remove_settings".' );
+			return new \WP_Error( 'craynai_nothing_to_do', 'Give "settings" and/or "remove_settings".' );
 		}
 		foreach ( array_merge( array_map( 'strval', array_keys( $set ) ), $remove ) as $key ) {
 			if ( in_array( $key, self::SPECIAL_PAGE_SETTINGS, true ) ) {
-				return new \WP_Error( 'crayn_safe_page_setting_not_allowed', sprintf( '"%s" is not stored in the Elementor page settings (Elementor keeps it on the post itself). Use the post tools for it.', $key ) );
+				return new \WP_Error( 'craynai_page_setting_not_allowed', sprintf( '"%s" is not stored in the Elementor page settings (Elementor keeps it on the post itself). Use the post tools for it.', $key ) );
 			}
 			if ( '' === $key ) {
-				return new \WP_Error( 'crayn_safe_settings_invalid', 'A page setting name cannot be empty.' );
+				return new \WP_Error( 'craynai_settings_invalid', 'A page setting name cannot be empty.' );
 			}
 		}
 
@@ -1632,7 +1632,7 @@ class ElementorAbilities extends AbilitiesBase {
 			return array_merge( $base, array( 'dry_run' => true, 'before' => array( 'page_settings' => (object) $current ), 'after' => array( 'page_settings' => (object) $merged ), 'change_id' => 0 ) );
 		}
 		if ( ! self::loggable( $state ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
+			return new \WP_Error( 'craynai_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
 		}
 
 		// Same storage as Elementor's page settings manager (core/settings/page/manager.php:204-212).
@@ -1642,13 +1642,13 @@ class ElementorAbilities extends AbilitiesBase {
 			update_post_meta( $post->ID, self::META_PAGE, wp_slash( $merged ) );
 		}
 		if ( self::meta_raw( $post->ID, self::META_PAGE ) !== $after_serialized ) {
-			return new \WP_Error( 'crayn_safe_elementor_write_failed', sprintf( 'The page settings of post %d could not be written.', (int) $post->ID ) );
+			return new \WP_Error( 'craynai_elementor_write_failed', sprintf( 'The page settings of post %d could not be written.', (int) $post->ID ) );
 		}
 		// The page settings feed the page CSS; Document::save() drops it and the element cache.
 		self::invalidate_caches( (int) $post->ID, is_array( $tree ) && ElementorTree::tree_has_atomic( $tree ) );
 
 		$after     = self::state( $post->ID );
-		$change_id = ChangeLogger::log( 'crayn-safe/elementor-page-settings', 'post', (int) $post->ID, $state, $after, 'Elementor page settings changed (' . implode( ', ', array_merge( array_map( 'strval', array_keys( $set ) ), array_map( static function ( $k ) { return '-' . $k; }, $remove ) ) ) . ')' );
+		$change_id = ChangeLogger::log( 'craynai/elementor-page-settings', 'post', (int) $post->ID, $state, $after, 'Elementor page settings changed (' . implode( ', ', array_merge( array_map( 'strval', array_keys( $set ) ), array_map( static function ( $k ) { return '-' . $k; }, $remove ) ) ) . ')' );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'The Elementor page settings of post %d were changed but could not be logged.', (int) $post->ID ) );
 		}
@@ -1663,7 +1663,7 @@ class ElementorAbilities extends AbilitiesBase {
 	 */
 	public static function execute_elementor_enable( $input ) {
 		$dry   = Safety::dry_run( $input );
-		$guard = Safety::guard( 'crayn-content', true, $dry );
+		$guard = Safety::guard( 'craynai-content', true, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
@@ -1672,7 +1672,7 @@ class ElementorAbilities extends AbilitiesBase {
 			return $post;
 		}
 		if ( ! class_exists( '\Elementor\Utils' ) || ! \Elementor\Utils::is_post_type_support( $post->post_type ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_post_type', sprintf( 'The post type "%s" is not enabled for Elementor (Elementor > Settings > General > Post Types).', $post->post_type ) );
+			return new \WP_Error( 'craynai_elementor_post_type', sprintf( 'The post type "%s" is not enabled for Elementor (Elementor > Settings > General > Post Types).', $post->post_type ) );
 		}
 		$state   = self::state( $post->ID );
 		$convert = ! empty( $input['convert_content'] );
@@ -1696,7 +1696,7 @@ class ElementorAbilities extends AbilitiesBase {
 		$new_raw = $state['data'];
 		$tree    = self::parse_state( $state );
 		if ( is_string( $tree ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_data_invalid', $tree . ' The post is left untouched.' );
+			return new \WP_Error( 'craynai_elementor_data_invalid', $tree . ' The post is left untouched.' );
 		}
 		$before_outline = ElementorTree::outline( $tree );
 		$has_data       = array() !== $tree['nodes'];
@@ -1705,7 +1705,7 @@ class ElementorAbilities extends AbilitiesBase {
 			$content = (string) $post->post_content;
 			if ( '' !== trim( $content ) ) {
 				if ( ! $convert ) {
-					return new \WP_Error( 'crayn_safe_elementor_content_would_be_lost', sprintf( 'Post %d has content but no Elementor data. Once Elementor is enabled the front end shows the (empty) Elementor page instead of that content. Pass convert_content: true to put the content into a text-editor widget, or leave the post alone.', (int) $post->ID ) );
+					return new \WP_Error( 'craynai_elementor_content_would_be_lost', sprintf( 'Post %d has content but no Elementor data. Once Elementor is enabled the front end shows the (empty) Elementor page instead of that content. Pass convert_content: true to put the content into a text-editor widget, or leave the post alone.', (int) $post->ID ) );
 				}
 				$converted = self::converted_tree( $content );
 				if ( is_wp_error( $converted ) ) {
@@ -1730,7 +1730,7 @@ class ElementorAbilities extends AbilitiesBase {
 			return array_merge( $base, array( 'dry_run' => true, 'outline' => $outline, 'before' => self::state_view( $state, $before_outline ), 'after' => self::state_view( $after_view, $outline ), 'change_id' => 0 ) );
 		}
 		if ( ! self::loggable( $state ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
+			return new \WP_Error( 'craynai_elementor_not_loggable', sprintf( 'The current Elementor data or content of post %d is not valid UTF-8 and cannot be stored in the change log, so nothing was changed.', (int) $post->ID ) );
 		}
 
 		if ( $new_raw !== $state['data'] ) {
@@ -1749,7 +1749,7 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 
 		$after     = self::state( $post->ID );
-		$change_id = ChangeLogger::log( 'crayn-safe/elementor-enable', 'post', (int) $post->ID, $state, $after, 'Elementor enabled' . ( $convert && ! $has_data && '' !== trim( (string) $post->post_content ) ? ' (content converted into a widget)' : '' ) );
+		$change_id = ChangeLogger::log( 'craynai/elementor-enable', 'post', (int) $post->ID, $state, $after, 'Elementor enabled' . ( $convert && ! $has_data && '' !== trim( (string) $post->post_content ) ? ' (content converted into a widget)' : '' ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Elementor was enabled for post %d but the change could not be logged.', (int) $post->ID ) );
 		}
@@ -1782,7 +1782,7 @@ class ElementorAbilities extends AbilitiesBase {
 			}
 		}
 		if ( ! $plugin->widgets_manager->get_widget_types( $widget_name ) ) {
-			return new \WP_Error( 'crayn_safe_widget_unknown', sprintf( 'The "%s" widget needed to hold the content is not registered.', $widget_name ) );
+			return new \WP_Error( 'craynai_widget_unknown', sprintf( 'The "%s" widget needed to hold the content is not registered.', $widget_name ) );
 		}
 		$widget = array(
 			'elType'     => 'widget',
@@ -1804,7 +1804,7 @@ class ElementorAbilities extends AbilitiesBase {
 		}
 		$res = ElementorTree::insert( array( 'nodes' => array(), 'src' => '' ), null, null, $element );
 		if ( is_string( $res ) ) {
-			return new \WP_Error( 'crayn_safe_elementor_internal', $res );
+			return new \WP_Error( 'craynai_elementor_internal', $res );
 		}
 		return $res['tree'];
 	}
@@ -1816,7 +1816,7 @@ class ElementorAbilities extends AbilitiesBase {
 	/**
 	 * Restore a logged Elementor change: the whole snapshot of the before state
 	 * (data meta byte for byte, page settings, edit mode, version, template type,
-	 * post_content). Refuses with crayn_safe_revert_conflict when anything of the
+	 * post_content). Refuses with craynai_revert_conflict when anything of the
 	 * snapshot changed after the logged write.
 	 *
 	 * @param array $row Change log row (raw columns).
@@ -1828,16 +1828,16 @@ class ElementorAbilities extends AbilitiesBase {
 		$keys    = array( 'data', 'page_settings', 'edit_mode', 'version', 'template_type', 'post_content' );
 		foreach ( $keys as $key ) {
 			if ( ! array_key_exists( $key, $before ) || ! array_key_exists( $key, $after ) ) {
-				return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no complete Elementor snapshot to restore.' );
+				return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no complete Elementor snapshot to restore.' );
 			}
 		}
 		$post_id = isset( $row['object_id'] ) ? (int) $row['object_id'] : 0;
 		$post    = $post_id > 0 ? get_post( $post_id ) : null;
 		if ( ! $post instanceof \WP_Post ) {
-			return new \WP_Error( 'crayn_safe_post_not_found', sprintf( 'Post %d does not exist anymore; nothing to restore.', $post_id ) );
+			return new \WP_Error( 'craynai_post_not_found', sprintf( 'Post %d does not exist anymore; nothing to restore.', $post_id ) );
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'You cannot edit this content.' );
+			return new \WP_Error( 'craynai_permission_denied', 'You cannot edit this content.' );
 		}
 		$runtime = self::runtime_error();
 		if ( is_wp_error( $runtime ) ) {
@@ -1848,7 +1848,7 @@ class ElementorAbilities extends AbilitiesBase {
 		foreach ( $keys as $key ) {
 			if ( $current[ $key ] !== $after[ $key ] ) {
 				return new \WP_Error(
-					'crayn_safe_revert_conflict',
+					'craynai_revert_conflict',
 					sprintf( 'Post %d changed after this edit (%s differs from what the edit left). Revert the newer changes first (see changes-list), newest first.', $post_id, $key )
 				);
 			}
@@ -1908,7 +1908,7 @@ class ElementorAbilities extends AbilitiesBase {
 		$now = self::state( $post_id );
 		foreach ( array( 'data', 'page_settings', 'edit_mode', 'version', 'template_type' ) as $key ) {
 			if ( $now[ $key ] !== $before[ $key ] ) {
-				return new \WP_Error( 'crayn_safe_elementor_restore_failed', sprintf( 'Restoring "%s" of post %d did not read back identical. The change stays marked as not reverted; retry or check the post.', $key, $post_id ) );
+				return new \WP_Error( 'craynai_elementor_restore_failed', sprintf( 'Restoring "%s" of post %d did not read back identical. The change stays marked as not reverted; retry or check the post.', $key, $post_id ) );
 			}
 		}
 		if ( $now['post_content'] !== (string) $before['post_content'] ) {

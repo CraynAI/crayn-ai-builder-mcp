@@ -33,10 +33,10 @@
  *   }
  * Tree shape: { nodes: node[], src: string | null }.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 

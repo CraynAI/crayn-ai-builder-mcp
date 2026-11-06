@@ -7,20 +7,20 @@
  * WordPress' own functions (wp_update_nav_menu_object, wp_update_nav_menu_item,
  * wp_delete_nav_menu, set_theme_mod) and logged with a snapshot of the WHOLE menu
  * (term, items, locations) before and after, so a revert is simple and exact on
- * title, url, parent and order. A revert refuses with crayn_safe_revert_conflict
+ * title, url, parent and order. A revert refuses with craynai_revert_conflict
  * when the menu changed after the logged write. Item and menu ids can change when
  * a deleted menu or item is recreated by a revert; the parents of the recreated
  * items are re-mapped to the new ids.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
-namespace CraynSafeMcp;
+namespace CraynAiBuilderMcp;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the "crayn-settings" menu abilities.
+ * Registers the "craynai-settings" menu abilities.
  */
 class MenuAbilities extends AbilitiesBase {
 
@@ -31,16 +31,16 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	public static function ability_names() {
 		return array(
-			'crayn-safe/menu-list',
-			'crayn-safe/menu-get',
-			'crayn-safe/menu-create',
-			'crayn-safe/menu-update',
-			'crayn-safe/menu-delete',
-			'crayn-safe/menu-item-add',
-			'crayn-safe/menu-item-update',
-			'crayn-safe/menu-item-move',
-			'crayn-safe/menu-item-remove',
-			'crayn-safe/menu-locations-set',
+			'craynai/menu-list',
+			'craynai/menu-get',
+			'craynai/menu-create',
+			'craynai/menu-update',
+			'craynai/menu-delete',
+			'craynai/menu-item-add',
+			'craynai/menu-item-update',
+			'craynai/menu-item-move',
+			'craynai/menu-item-remove',
+			'craynai/menu-locations-set',
 		);
 	}
 
@@ -114,7 +114,7 @@ class MenuAbilities extends AbilitiesBase {
 			array(
 				'label'               => $label,
 				'description'         => $description,
-				'category'            => 'crayn-settings',
+				'category'            => 'craynai-settings',
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => $properties,
@@ -135,7 +135,7 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	public static function register() {
 		self::define(
-			'crayn-safe/menu-list',
+			'craynai/menu-list',
 			'List menus',
 			'List the navigation menus (id, name, slug, item count, assigned theme locations) and the theme locations (slug, label, assigned menu). Read only.',
 			array(),
@@ -154,7 +154,7 @@ class MenuAbilities extends AbilitiesBase {
 			)
 		);
 		self::define(
-			'crayn-safe/menu-get',
+			'craynai/menu-get',
 			'Get menu',
 			'Get one menu with its items nested by parent: id, title, url, type (custom|post_type|taxonomy), object, object_id, parent, order, classes, target, attr_title, description, xfn, status, children. Read only.',
 			array( 'menu' => self::menu_property() ),
@@ -174,7 +174,7 @@ class MenuAbilities extends AbilitiesBase {
 			)
 		);
 		self::define(
-			'crayn-safe/menu-create',
+			'craynai/menu-create',
 			'Create menu',
 			'Create an empty navigation menu. The name must be unique. Assign it to a theme location with menu-locations-set. Accepts dry_run; logged with change_id (revert deletes the empty menu).',
 			array(
@@ -188,7 +188,7 @@ class MenuAbilities extends AbilitiesBase {
 			false
 		);
 		self::define(
-			'crayn-safe/menu-update',
+			'craynai/menu-update',
 			'Rename menu',
 			'Change the name and/or description of a menu. The slug stays as it is (templates may reference it). Accepts dry_run; logged with change_id.',
 			array(
@@ -203,7 +203,7 @@ class MenuAbilities extends AbilitiesBase {
 			true
 		);
 		self::define(
-			'crayn-safe/menu-delete',
+			'craynai/menu-delete',
 			'Delete menu',
 			'Delete a menu with all its items; the theme locations that pointed to it become empty. The whole menu (items, parents, order, locations) is kept in the change log and change-revert recreates it. A revert gives the menu and its items NEW ids (parents are re-mapped); widgets/blocks that stored the old menu id are not re-pointed. Accepts dry_run; logged with change_id.',
 			array( 'menu' => self::menu_property() ),
@@ -214,7 +214,7 @@ class MenuAbilities extends AbilitiesBase {
 			true
 		);
 		self::define(
-			'crayn-safe/menu-item-add',
+			'craynai/menu-item-add',
 			'Add menu item',
 			'Add an item to a menu: type "custom" (title + url), "page" or "post" (object_id; post_type for other public post types), or "term" (object_id + taxonomy, default category). The target must exist. parent is an item id of the same menu (default top level); position is 0-based among the siblings under that parent (default last). Accepts dry_run; logged with change_id.',
 			array_merge(
@@ -237,7 +237,7 @@ class MenuAbilities extends AbilitiesBase {
 			false
 		);
 		self::define(
-			'crayn-safe/menu-item-update',
+			'craynai/menu-item-update',
 			'Update menu item',
 			'Change the text, target, classes, title attribute, description or XFN of an item; "url" only for custom items. Only given fields change. Accepts dry_run; logged with change_id.',
 			array_merge(
@@ -254,7 +254,7 @@ class MenuAbilities extends AbilitiesBase {
 			true
 		);
 		self::define(
-			'crayn-safe/menu-item-move',
+			'craynai/menu-item-move',
 			'Move menu item',
 			'Move an item (with its sub-items) to another parent of the same menu and/or position. parent 0 = top level; position is 0-based among the new siblings (omit = last). Moving an item into itself or its own descendants is refused. Accepts dry_run; logged with change_id.',
 			array(
@@ -269,7 +269,7 @@ class MenuAbilities extends AbilitiesBase {
 			false
 		);
 		self::define(
-			'crayn-safe/menu-item-remove',
+			'craynai/menu-item-remove',
 			'Remove menu item',
 			'Remove an item from its menu. Its sub-items move up to the removed item\'s parent. The item and the previous parents are kept in the change log; change-revert restores the item (with a new id) and the parents of its children. Accepts dry_run; logged with change_id.',
 			array( 'item_id' => array( 'type' => 'integer', 'description' => 'Menu item id.' ) ),
@@ -280,7 +280,7 @@ class MenuAbilities extends AbilitiesBase {
 			true
 		);
 		self::define(
-			'crayn-safe/menu-locations-set',
+			'craynai/menu-locations-set',
 			'Set menu locations',
 			'Assign menus to theme locations or clear them. "locations" maps a registered location slug to a menu (id, slug or name), or to 0 / "" to unassign. Unknown locations and menus are refused. The assignment is stored per theme. Accepts dry_run; logged with change_id (revert restores exactly the touched locations).',
 			array(
@@ -305,7 +305,7 @@ class MenuAbilities extends AbilitiesBase {
 	 * @return bool
 	 */
 	public static function permission( $input = array() ) {
-		return current_user_can( 'edit_theme_options' ) && null === Safety::guard( 'crayn-settings', false );
+		return current_user_can( 'edit_theme_options' ) && null === Safety::guard( 'craynai-settings', false );
 	}
 
 	/**
@@ -316,12 +316,12 @@ class MenuAbilities extends AbilitiesBase {
 	 * @return \WP_Error|null
 	 */
 	private static function begin( $write, $dry = false ) {
-		$guard = Safety::guard( 'crayn-settings', $write, $dry );
+		$guard = Safety::guard( 'craynai-settings', $write, $dry );
 		if ( is_wp_error( $guard ) ) {
 			return $guard;
 		}
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Editing menus requires the edit_theme_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Editing menus requires the edit_theme_options capability.' );
 		}
 		return null;
 	}
@@ -556,11 +556,11 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	private static function resolve_menu( $ref ) {
 		if ( null === $ref || '' === $ref || false === $ref || array() === $ref || is_array( $ref ) || is_object( $ref ) ) {
-			return new \WP_Error( 'crayn_safe_menu_required', 'A menu (id, slug or name) is required. See menu-list.' );
+			return new \WP_Error( 'craynai_menu_required', 'A menu (id, slug or name) is required. See menu-list.' );
 		}
 		$menu = wp_get_nav_menu_object( is_numeric( $ref ) ? (int) $ref : (string) $ref );
 		if ( ! $menu || is_wp_error( $menu ) ) {
-			return new \WP_Error( 'crayn_safe_menu_not_found', sprintf( 'Menu "%s" does not exist. See menu-list.', is_scalar( $ref ) ? (string) $ref : '' ) );
+			return new \WP_Error( 'craynai_menu_not_found', sprintf( 'Menu "%s" does not exist. See menu-list.', is_scalar( $ref ) ? (string) $ref : '' ) );
 		}
 		return $menu;
 	}
@@ -665,7 +665,7 @@ class MenuAbilities extends AbilitiesBase {
 	 * @return array|null
 	 */
 	public static function current_snapshot( $ability, $menu_id ) {
-		if ( 'crayn-safe/menu-locations-set' === $ability ) {
+		if ( 'craynai/menu-locations-set' === $ability ) {
 			return array( 'locations' => self::current_locations_raw() );
 		}
 		$snap = self::snapshot( (int) $menu_id );
@@ -786,7 +786,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$snap = self::snapshot( (int) $menu->term_id );
 		if ( null === $snap ) {
-			return new \WP_Error( 'crayn_safe_menu_not_found', 'The menu disappeared while it was read.' );
+			return new \WP_Error( 'craynai_menu_not_found', 'The menu disappeared while it was read.' );
 		}
 		return array(
 			'menu'      => $snap['menu'],
@@ -893,7 +893,7 @@ class MenuAbilities extends AbilitiesBase {
 			if ( ! isset( $wnt[ $id ] ) ) {
 				$deleted = wp_delete_post( (int) $id, true );
 				if ( ! $deleted ) {
-					return new \WP_Error( 'crayn_safe_menu_item_delete_failed', sprintf( 'Menu item %d could not be deleted.', (int) $id ) );
+					return new \WP_Error( 'craynai_menu_item_delete_failed', sprintf( 'Menu item %d could not be deleted.', (int) $id ) );
 				}
 			}
 		}
@@ -921,7 +921,7 @@ class MenuAbilities extends AbilitiesBase {
 				return $new;
 			}
 			if ( ! $new ) {
-				return new \WP_Error( 'crayn_safe_menu_item_create_failed', 'A menu item could not be created.' );
+				return new \WP_Error( 'craynai_menu_item_create_failed', 'A menu item could not be created.' );
 			}
 			$map[ $wid ] = (int) $new;
 		}
@@ -960,7 +960,7 @@ class MenuAbilities extends AbilitiesBase {
 	private static function sync_menu_fields( $menu_id, array $fields ) {
 		$menu = wp_get_nav_menu_object( (int) $menu_id );
 		if ( ! $menu || is_wp_error( $menu ) ) {
-			return new \WP_Error( 'crayn_safe_menu_not_found', 'The menu does not exist.' );
+			return new \WP_Error( 'craynai_menu_not_found', 'The menu does not exist.' );
 		}
 		if ( $menu->name !== $fields['name'] || $menu->description !== $fields['description'] ) {
 			$res = wp_update_nav_menu_object(
@@ -1018,7 +1018,7 @@ class MenuAbilities extends AbilitiesBase {
 	private static function apply_menu_change( $menu_id, $ability, $plan, $note, $dry, array $extra = array() ) {
 		$before = self::snapshot( (int) $menu_id );
 		if ( null === $before ) {
-			return new \WP_Error( 'crayn_safe_menu_not_found', 'The menu does not exist.' );
+			return new \WP_Error( 'craynai_menu_not_found', 'The menu does not exist.' );
 		}
 		$want = call_user_func( $plan, $before );
 		if ( is_wp_error( $want ) ) {
@@ -1059,11 +1059,11 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$map = self::sync_items( (int) $menu_id, $before['items'], $want['items'] );
 		if ( is_wp_error( $map ) ) {
-			return new \WP_Error( 'crayn_safe_menu_apply_failed', 'The menu was only partly changed: ' . $map->get_error_message() . ' Check it with menu-get.' );
+			return new \WP_Error( 'craynai_menu_apply_failed', 'The menu was only partly changed: ' . $map->get_error_message() . ' Check it with menu-get.' );
 		}
 		$after = self::snapshot( (int) $menu_id );
 		if ( null === $after ) {
-			return new \WP_Error( 'crayn_safe_menu_apply_failed', 'The menu could not be read back after the write. Check it with menu-get.' );
+			return new \WP_Error( 'craynai_menu_apply_failed', 'The menu could not be read back after the write. Check it with menu-get.' );
 		}
 		// The change is applied, so it is logged whatever the read-back shows.
 		$change_id = ChangeLogger::log( $ability, 'menu', (int) $menu_id, $before, $after, $note );
@@ -1103,14 +1103,14 @@ class MenuAbilities extends AbilitiesBase {
 	private static function clean_menu_name( $name, $exclude = 0 ) {
 		$clean = trim( sanitize_text_field( is_scalar( $name ) ? (string) $name : '' ) );
 		if ( '' === $clean ) {
-			return new \WP_Error( 'crayn_safe_menu_name_required', 'A non-empty menu name is required.' );
+			return new \WP_Error( 'craynai_menu_name_required', 'A non-empty menu name is required.' );
 		}
 		if ( strlen( $clean ) > 200 ) {
-			return new \WP_Error( 'crayn_safe_menu_name_invalid', 'The menu name is too long (200 characters at most).' );
+			return new \WP_Error( 'craynai_menu_name_invalid', 'The menu name is too long (200 characters at most).' );
 		}
 		$existing = get_term_by( 'name', $clean, 'nav_menu' );
 		if ( $existing && ! is_wp_error( $existing ) && (int) $existing->term_id !== (int) $exclude ) {
-			return new \WP_Error( 'crayn_safe_menu_exists', sprintf( 'A menu named "%s" already exists (id %d).', $clean, (int) $existing->term_id ) );
+			return new \WP_Error( 'craynai_menu_exists', sprintf( 'A menu named "%s" already exists (id %d).', $clean, (int) $existing->term_id ) );
 		}
 		return $clean;
 	}
@@ -1158,9 +1158,9 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$after = self::snapshot( (int) $id );
 		if ( null === $after ) {
-			return new \WP_Error( 'crayn_safe_menu_apply_failed', 'The menu could not be read back after it was created.' );
+			return new \WP_Error( 'craynai_menu_apply_failed', 'The menu could not be read back after it was created.' );
 		}
-		$change_id = ChangeLogger::log( 'crayn-safe/menu-create', 'menu', (int) $id, self::empty_snapshot(), $after, sprintf( 'menu "%s" created', $name ) );
+		$change_id = ChangeLogger::log( 'craynai/menu-create', 'menu', (int) $id, self::empty_snapshot(), $after, sprintf( 'menu "%s" created', $name ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Menu %d was created.', (int) $id ) );
 		}
@@ -1190,7 +1190,7 @@ class MenuAbilities extends AbilitiesBase {
 			return $menu;
 		}
 		if ( ! isset( $input['name'] ) && ! isset( $input['description'] ) ) {
-			return new \WP_Error( 'crayn_safe_nothing_to_do', 'Give "name" and/or "description".' );
+			return new \WP_Error( 'craynai_nothing_to_do', 'Give "name" and/or "description".' );
 		}
 		$name = null;
 		if ( isset( $input['name'] ) ) {
@@ -1203,7 +1203,7 @@ class MenuAbilities extends AbilitiesBase {
 
 		return self::apply_menu_change(
 			(int) $menu->term_id,
-			'crayn-safe/menu-update',
+			'craynai/menu-update',
 			static function ( $snap ) use ( $name, $description ) {
 				if ( null !== $name ) {
 					$snap['menu']['name'] = $name;
@@ -1236,7 +1236,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$before = self::snapshot( (int) $menu->term_id );
 		if ( null === $before ) {
-			return new \WP_Error( 'crayn_safe_menu_not_found', 'The menu does not exist.' );
+			return new \WP_Error( 'craynai_menu_not_found', 'The menu does not exist.' );
 		}
 		$note = 'change-revert recreates the menu and its items with NEW ids (parents are re-mapped); widgets or blocks that stored the old menu id are not re-pointed.';
 		if ( $dry ) {
@@ -1251,12 +1251,12 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$deleted = wp_delete_nav_menu( (int) $menu->term_id );
 		if ( ! $deleted || is_wp_error( $deleted ) ) {
-			return new \WP_Error( 'crayn_safe_menu_delete_failed', 'The menu could not be deleted.' );
+			return new \WP_Error( 'craynai_menu_delete_failed', 'The menu could not be deleted.' );
 		}
 		if ( null !== self::snapshot( (int) $menu->term_id ) ) {
-			return new \WP_Error( 'crayn_safe_menu_delete_failed', 'The menu still exists after the delete.' );
+			return new \WP_Error( 'craynai_menu_delete_failed', 'The menu still exists after the delete.' );
 		}
-		$change_id = ChangeLogger::log( 'crayn-safe/menu-delete', 'menu', (int) $menu->term_id, $before, self::empty_snapshot(), sprintf( 'menu "%s" (%d items) deleted', $menu->name, count( $before['items'] ) ) );
+		$change_id = ChangeLogger::log( 'craynai/menu-delete', 'menu', (int) $menu->term_id, $before, self::empty_snapshot(), sprintf( 'menu "%s" (%d items) deleted', $menu->name, count( $before['items'] ) ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( sprintf( 'Menu %d was deleted.', (int) $menu->term_id ) );
 		}
@@ -1295,7 +1295,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		if ( isset( $input['target'] ) ) {
 			if ( ! in_array( (string) $input['target'], array( '', '_blank' ), true ) ) {
-				return new \WP_Error( 'crayn_safe_menu_item_invalid', 'target must be "" or "_blank".' );
+				return new \WP_Error( 'craynai_menu_item_invalid', 'target must be "" or "_blank".' );
 			}
 			$out['target'] = (string) $input['target'];
 		}
@@ -1319,11 +1319,11 @@ class MenuAbilities extends AbilitiesBase {
 	private static function clean_url( $url ) {
 		$raw = trim( is_scalar( $url ) ? (string) $url : '' );
 		if ( '' === $raw ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', 'A custom item needs a url.' );
+			return new \WP_Error( 'craynai_menu_item_invalid', 'A custom item needs a url.' );
 		}
 		$clean = sanitize_url( $raw, array( 'http', 'https', 'mailto', 'tel' ) );
 		if ( '' === $clean ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'The url "%s" is not a valid link (allowed: http(s), relative paths, #anchors, mailto:, tel:).', $raw ) );
+			return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'The url "%s" is not a valid link (allowed: http(s), relative paths, #anchors, mailto:, tel:).', $raw ) );
 		}
 		return $clean;
 	}
@@ -1338,21 +1338,21 @@ class MenuAbilities extends AbilitiesBase {
 		$type      = (string) $input['type'];
 		$object_id = isset( $input['object_id'] ) ? (int) $input['object_id'] : 0;
 		if ( $object_id <= 0 ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'A "%s" item needs object_id.', $type ) );
+			return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'A "%s" item needs object_id.', $type ) );
 		}
 		if ( 'page' === $type || 'post' === $type ) {
 			$post_type = 'page' === $type ? 'page' : ( isset( $input['post_type'] ) && '' !== $input['post_type'] ? sanitize_key( (string) $input['post_type'] ) : 'post' );
 			$pto       = get_post_type_object( $post_type );
 			if ( ! $pto || ( empty( $pto->public ) && empty( $pto->show_in_nav_menus ) ) ) {
-				return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'Post type "%s" does not exist or is not public.', $post_type ) );
+				return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'Post type "%s" does not exist or is not public.', $post_type ) );
 			}
 			$post = get_post( $object_id );
 			if ( ! $post instanceof \WP_Post || $post->post_type !== $post_type || in_array( $post->post_status, array( 'trash', 'auto-draft' ), true ) ) {
-				return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'There is no %s with id %d.', $post_type, $object_id ) );
+				return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'There is no %s with id %d.', $post_type, $object_id ) );
 			}
 			// A menu item shows the title and link: a private post stays hidden from those who cannot read it.
 			if ( ! current_user_can( 'read_post', $object_id ) ) {
-				return new \WP_Error( 'crayn_safe_permission_denied', sprintf( 'You cannot read %s %d.', $post_type, $object_id ) );
+				return new \WP_Error( 'craynai_permission_denied', sprintf( 'You cannot read %s %d.', $post_type, $object_id ) );
 			}
 			return array(
 				'type'          => 'post_type',
@@ -1364,11 +1364,11 @@ class MenuAbilities extends AbilitiesBase {
 		$taxonomy = isset( $input['taxonomy'] ) && '' !== $input['taxonomy'] ? sanitize_key( (string) $input['taxonomy'] ) : 'category';
 		$tax      = get_taxonomy( $taxonomy );
 		if ( ! $tax || ( empty( $tax->public ) && empty( $tax->show_in_nav_menus ) ) ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'Taxonomy "%s" does not exist or is not public.', $taxonomy ) );
+			return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'Taxonomy "%s" does not exist or is not public.', $taxonomy ) );
 		}
 		$term = get_term( $object_id, $taxonomy );
 		if ( ! $term instanceof \WP_Term ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'There is no %s term with id %d.', $taxonomy, $object_id ) );
+			return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'There is no %s term with id %d.', $taxonomy, $object_id ) );
 		}
 		return array(
 			'type'          => 'taxonomy',
@@ -1396,7 +1396,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$type = isset( $input['type'] ) ? (string) $input['type'] : '';
 		if ( ! in_array( $type, array( 'custom', 'page', 'post', 'term' ), true ) ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', 'type must be custom, page, post or term.' );
+			return new \WP_Error( 'craynai_menu_item_invalid', 'type must be custom, page, post or term.' );
 		}
 		$fields = self::item_field_changes( $input );
 		if ( is_wp_error( $fields ) ) {
@@ -1425,7 +1425,7 @@ class MenuAbilities extends AbilitiesBase {
 				return $url;
 			}
 			if ( ! isset( $fields['title'] ) || '' === $fields['title'] ) {
-				return new \WP_Error( 'crayn_safe_menu_item_invalid', 'A custom item needs a title.' );
+				return new \WP_Error( 'craynai_menu_item_invalid', 'A custom item needs a title.' );
 			}
 			$item['url'] = $url;
 		} else {
@@ -1451,11 +1451,11 @@ class MenuAbilities extends AbilitiesBase {
 
 		return self::apply_menu_change(
 			(int) $menu->term_id,
-			'crayn-safe/menu-item-add',
+			'craynai/menu-item-add',
 			static function ( $snap ) use ( $item, $parent, $position ) {
 				$ids = self::by_id( $snap['items'] );
 				if ( $parent > 0 && ! isset( $ids[ $parent ] ) ) {
-					return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'Parent item %d is not an item of this menu.', $parent ) );
+					return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'Parent item %d is not an item of this menu.', $parent ) );
 				}
 				$snap['items'][] = $item;
 				$snap['items']   = self::place( $snap['items'], -1, $parent, $position );
@@ -1477,11 +1477,11 @@ class MenuAbilities extends AbilitiesBase {
 		$item_id = (int) $item_id;
 		$post    = $item_id > 0 ? get_post( $item_id ) : null;
 		if ( ! $post instanceof \WP_Post || 'nav_menu_item' !== $post->post_type ) {
-			return new \WP_Error( 'crayn_safe_menu_item_not_found', sprintf( 'Menu item %d does not exist. See menu-get.', $item_id ) );
+			return new \WP_Error( 'craynai_menu_item_not_found', sprintf( 'Menu item %d does not exist. See menu-get.', $item_id ) );
 		}
 		$menu_ids = wp_get_object_terms( $item_id, 'nav_menu', array( 'fields' => 'ids' ) );
 		if ( is_wp_error( $menu_ids ) || empty( $menu_ids ) ) {
-			return new \WP_Error( 'crayn_safe_menu_item_orphaned', sprintf( 'Menu item %d does not belong to a menu.', $item_id ) );
+			return new \WP_Error( 'craynai_menu_item_orphaned', sprintf( 'Menu item %d does not belong to a menu.', $item_id ) );
 		}
 		return array(
 			'item'    => self::item_from_post( $post ),
@@ -1511,7 +1511,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		if ( isset( $input['url'] ) ) {
 			if ( 'custom' !== $loaded['item']['type'] ) {
-				return new \WP_Error( 'crayn_safe_menu_item_invalid', 'Only custom items have their own url; this item points to a page, post or term.' );
+				return new \WP_Error( 'craynai_menu_item_invalid', 'Only custom items have their own url; this item points to a page, post or term.' );
 			}
 			$url = self::clean_url( $input['url'] );
 			if ( is_wp_error( $url ) ) {
@@ -1520,16 +1520,16 @@ class MenuAbilities extends AbilitiesBase {
 			$changes['url'] = $url;
 		}
 		if ( array() === $changes ) {
-			return new \WP_Error( 'crayn_safe_nothing_to_do', 'Give at least one field to change.' );
+			return new \WP_Error( 'craynai_nothing_to_do', 'Give at least one field to change.' );
 		}
 		$item_id = (int) $loaded['item']['id'];
 		if ( 'custom' === $loaded['item']['type'] && isset( $changes['title'] ) && '' === $changes['title'] ) {
-			return new \WP_Error( 'crayn_safe_menu_item_invalid', 'A custom item needs a title.' );
+			return new \WP_Error( 'craynai_menu_item_invalid', 'A custom item needs a title.' );
 		}
 
 		return self::apply_menu_change(
 			$loaded['menu_id'],
-			'crayn-safe/menu-item-update',
+			'craynai/menu-item-update',
 			static function ( $snap ) use ( $item_id, $changes ) {
 				foreach ( $snap['items'] as $i => $item ) {
 					if ( (int) $item['id'] === $item_id ) {
@@ -1570,14 +1570,14 @@ class MenuAbilities extends AbilitiesBase {
 
 		return self::apply_menu_change(
 			$loaded['menu_id'],
-			'crayn-safe/menu-item-move',
+			'craynai/menu-item-move',
 			static function ( $snap ) use ( $item_id, $parent, $position ) {
 				$ids = self::by_id( $snap['items'] );
 				if ( $parent > 0 && ! isset( $ids[ $parent ] ) ) {
-					return new \WP_Error( 'crayn_safe_menu_item_invalid', sprintf( 'Parent item %d is not an item of the same menu.', $parent ) );
+					return new \WP_Error( 'craynai_menu_item_invalid', sprintf( 'Parent item %d is not an item of the same menu.', $parent ) );
 				}
 				if ( $parent === $item_id || in_array( $parent, self::descendants( $snap['items'], $item_id ), true ) ) {
-					return new \WP_Error( 'crayn_safe_menu_cycle', 'An item cannot be moved into itself or one of its own sub-items.' );
+					return new \WP_Error( 'craynai_menu_cycle', 'An item cannot be moved into itself or one of its own sub-items.' );
 				}
 				$snap['items'] = self::place( $snap['items'], $item_id, $parent, $position );
 				return $snap;
@@ -1608,11 +1608,11 @@ class MenuAbilities extends AbilitiesBase {
 
 		return self::apply_menu_change(
 			$loaded['menu_id'],
-			'crayn-safe/menu-item-remove',
+			'craynai/menu-item-remove',
 			static function ( $snap ) use ( $item_id ) {
 				$ids = self::by_id( $snap['items'] );
 				if ( ! isset( $ids[ $item_id ] ) ) {
-					return new \WP_Error( 'crayn_safe_menu_item_not_found', 'The item is not in this menu.' );
+					return new \WP_Error( 'craynai_menu_item_not_found', 'The item is not in this menu.' );
 				}
 				$up = (int) $ids[ $item_id ]['parent'];
 				if ( 0 !== $up && ! isset( $ids[ $up ] ) ) {
@@ -1654,7 +1654,7 @@ class MenuAbilities extends AbilitiesBase {
 			return $error;
 		}
 		if ( ! isset( $input['locations'] ) || ! is_array( $input['locations'] ) || array() === $input['locations'] ) {
-			return new \WP_Error( 'crayn_safe_locations_required', 'Give "locations": an object of location slug => menu (id, slug or name), or 0 to unassign.' );
+			return new \WP_Error( 'craynai_locations_required', 'Give "locations": an object of location slug => menu (id, slug or name), or 0 to unassign.' );
 		}
 		$registered = get_registered_nav_menus();
 		$current    = self::current_locations_raw();
@@ -1678,7 +1678,7 @@ class MenuAbilities extends AbilitiesBase {
 			$wanted[ $slug ] = (int) $menu->term_id;
 		}
 		if ( array() !== $problems ) {
-			return new \WP_Error( 'crayn_safe_locations_invalid', 'Nothing was changed. ' . implode( ' ', $problems ) );
+			return new \WP_Error( 'craynai_locations_invalid', 'Nothing was changed. ' . implode( ' ', $problems ) );
 		}
 
 		$before = array();
@@ -1710,10 +1710,10 @@ class MenuAbilities extends AbilitiesBase {
 			$got = isset( $now[ $slug ] ) ? $now[ $slug ] : 0;
 			if ( (int) $got !== (int) $id ) {
 				self::write_locations( $before );
-				return new \WP_Error( 'crayn_safe_locations_failed', sprintf( 'The assignment of "%s" was not stored; the touched locations were restored.', $slug ) );
+				return new \WP_Error( 'craynai_locations_failed', sprintf( 'The assignment of "%s" was not stored; the touched locations were restored.', $slug ) );
 			}
 		}
-		$change_id = ChangeLogger::log( 'crayn-safe/menu-locations-set', 'menu', 0, array( 'locations' => $before, 'theme' => get_stylesheet() ), array( 'locations' => $after ), 'menu locations changed: ' . implode( ', ', array_keys( $after ) ) );
+		$change_id = ChangeLogger::log( 'craynai/menu-locations-set', 'menu', 0, array( 'locations' => $before, 'theme' => get_stylesheet() ), array( 'locations' => $after ), 'menu locations changed: ' . implode( ', ', array_keys( $after ) ) );
 		if ( ! $change_id ) {
 			return ChangeLogger::unlogged_error( 'Menu locations changed: ' . implode( ', ', array_keys( $after ) ) . '.' );
 		}
@@ -1726,7 +1726,7 @@ class MenuAbilities extends AbilitiesBase {
 	// ---------------------------------------------------------------------
 
 	/**
-	 * Restore a logged menu change. Refuses with crayn_safe_revert_conflict when
+	 * Restore a logged menu change. Refuses with craynai_revert_conflict when
 	 * the menu (or the touched locations) changed after the logged write.
 	 *
 	 * @param array $row Change log row (raw columns).
@@ -1734,25 +1734,25 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	public static function revert( array $row ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new \WP_Error( 'crayn_safe_permission_denied', 'Reverting menu changes requires the edit_theme_options capability.' );
+			return new \WP_Error( 'craynai_permission_denied', 'Reverting menu changes requires the edit_theme_options capability.' );
 		}
 		$ability = isset( $row['ability'] ) ? (string) $row['ability'] : '';
 		$before  = ChangeLogger::decode( isset( $row['before_data'] ) ? $row['before_data'] : '' );
 		$after   = ChangeLogger::decode( isset( $row['after_data'] ) ? $row['after_data'] : '' );
 
-		if ( 'crayn-safe/menu-locations-set' === $ability ) {
+		if ( 'craynai/menu-locations-set' === $ability ) {
 			return self::revert_locations( $before, $after );
 		}
 		foreach ( array( $before, $after ) as $snap ) {
 			if ( ! array_key_exists( 'menu', $snap ) || ! isset( $snap['items'] ) || ! isset( $snap['locations'] ) ) {
-				return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no complete menu snapshot to restore.' );
+				return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no complete menu snapshot to restore.' );
 			}
 		}
 
 		// 1. Menu created by the change: delete it again.
 		if ( null === $before['menu'] ) {
 			if ( null === $after['menu'] ) {
-				return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no menu to act on.' );
+				return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no menu to act on.' );
 			}
 			$id  = (int) $after['menu']['term_id'];
 			$cur = self::snapshot( $id );
@@ -1761,7 +1761,7 @@ class MenuAbilities extends AbilitiesBase {
 			}
 			$deleted = wp_delete_nav_menu( $id );
 			if ( ! $deleted || is_wp_error( $deleted ) ) {
-				return new \WP_Error( 'crayn_safe_menu_delete_failed', 'The menu could not be deleted.' );
+				return new \WP_Error( 'craynai_menu_delete_failed', 'The menu could not be deleted.' );
 			}
 			return sprintf( 'Menu %d (created by the reverted change) deleted.', $id );
 		}
@@ -1783,11 +1783,11 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$map = self::sync_items( $id, $cur['items'], $before['items'], true );
 		if ( is_wp_error( $map ) ) {
-			return new \WP_Error( 'crayn_safe_revert_failed', 'The menu was only partly restored: ' . $map->get_error_message() );
+			return new \WP_Error( 'craynai_revert_failed', 'The menu was only partly restored: ' . $map->get_error_message() );
 		}
 		$now = self::snapshot( $id );
 		if ( null === $now ) {
-			return new \WP_Error( 'crayn_safe_revert_failed', 'The menu could not be read back after the restore. Check it with menu-get.' );
+			return new \WP_Error( 'craynai_revert_failed', 'The menu could not be read back after the restore. Check it with menu-get.' );
 		}
 		$differs = self::same( self::normalized( $now ), self::normalized( $before ) ) ? '' : ' Note: the stored menu differs slightly from the snapshot (WordPress filtered or normalized some text).';
 		$renumbered = 0;
@@ -1807,7 +1807,7 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	private static function menu_conflict( $menu_id ) {
 		return new \WP_Error(
-			'crayn_safe_revert_conflict',
+			'craynai_revert_conflict',
 			sprintf( 'Menu %d changed after this edit (or no longer exists). Revert the newer changes first (see changes-list), newest first.', (int) $menu_id )
 		);
 	}
@@ -1825,14 +1825,14 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$same_name = get_term_by( 'name', $before['menu']['name'], 'nav_menu' );
 		if ( $same_name && ! is_wp_error( $same_name ) ) {
-			return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'A menu named "%s" exists now (id %d), so the deleted menu cannot be recreated. Rename or delete that menu first.', $before['menu']['name'], (int) $same_name->term_id ) );
+			return new \WP_Error( 'craynai_revert_conflict', sprintf( 'A menu named "%s" exists now (id %d), so the deleted menu cannot be recreated. Rename or delete that menu first.', $before['menu']['name'], (int) $same_name->term_id ) );
 		}
 		$registered = get_registered_nav_menus();
 		$locations  = array();
 		foreach ( $before['locations'] as $slug ) {
 			$current = self::current_locations_raw();
 			if ( isset( $current[ $slug ] ) && $current[ $slug ] > 0 && null !== self::snapshot( $current[ $slug ] ) ) {
-				return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'Location "%s" has another menu assigned now. Unassign it first (menu-locations-set).', $slug ) );
+				return new \WP_Error( 'craynai_revert_conflict', sprintf( 'Location "%s" has another menu assigned now. Unassign it first (menu-locations-set).', $slug ) );
 			}
 			if ( isset( $registered[ $slug ] ) ) {
 				$locations[ $slug ] = true;
@@ -1855,7 +1855,7 @@ class MenuAbilities extends AbilitiesBase {
 		}
 		$map = self::sync_items( (int) $new_id, array(), $before['items'], true );
 		if ( is_wp_error( $map ) ) {
-			return new \WP_Error( 'crayn_safe_revert_failed', 'The menu was recreated (id ' . (int) $new_id . ') but its items were only partly restored: ' . $map->get_error_message() );
+			return new \WP_Error( 'craynai_revert_failed', 'The menu was recreated (id ' . (int) $new_id . ') but its items were only partly restored: ' . $map->get_error_message() );
 		}
 		if ( array() !== $locations ) {
 			$changes = array();
@@ -1869,7 +1869,7 @@ class MenuAbilities extends AbilitiesBase {
 		$want['locations'] = array_values( array_intersect( $before['locations'], array_keys( $registered ) ) );
 		sort( $want['locations'] );
 		if ( null === $now ) {
-			return new \WP_Error( 'crayn_safe_revert_failed', sprintf( 'The recreated menu (id %d) could not be read back. Check it with menu-get.', (int) $new_id ) );
+			return new \WP_Error( 'craynai_revert_failed', sprintf( 'The recreated menu (id %d) could not be read back. Check it with menu-get.', (int) $new_id ) );
 		}
 		$differs = self::same( self::normalized( $now ), self::normalized( $want ) ) ? '' : ' Note: the stored menu differs slightly from the snapshot (WordPress filtered or normalized some text).';
 		return sprintf( 'Menu "%s" recreated with %d item(s). The menu id changed from %d to %d (item ids changed too; parents were re-mapped).%s', $before['menu']['name'], count( $before['items'] ), $old_id, (int) $new_id, $differs );
@@ -1884,17 +1884,17 @@ class MenuAbilities extends AbilitiesBase {
 	 */
 	private static function revert_locations( array $before, array $after ) {
 		if ( ! isset( $before['locations'], $after['locations'] ) || ! is_array( $before['locations'] ) || ! is_array( $after['locations'] ) ) {
-			return new \WP_Error( 'crayn_safe_revert_no_snapshot', 'The change log row has no location snapshot to restore.' );
+			return new \WP_Error( 'craynai_revert_no_snapshot', 'The change log row has no location snapshot to restore.' );
 		}
 		// Locations belong to a theme: restoring them on another theme would change the wrong one.
 		if ( isset( $before['theme'] ) && get_stylesheet() !== $before['theme'] ) {
-			return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'These locations belong to theme "%s", which is no longer active. Switch back to it to revert this change.', (string) $before['theme'] ) );
+			return new \WP_Error( 'craynai_revert_conflict', sprintf( 'These locations belong to theme "%s", which is no longer active. Switch back to it to revert this change.', (string) $before['theme'] ) );
 		}
 		$current = self::current_locations_raw();
 		foreach ( $after['locations'] as $slug => $id ) {
 			$got = isset( $current[ $slug ] ) ? $current[ $slug ] : 0;
 			if ( (int) $got !== (int) $id ) {
-				return new \WP_Error( 'crayn_safe_revert_conflict', sprintf( 'Location "%s" was changed after this edit. Revert the newer changes first (see changes-list), newest first.', $slug ) );
+				return new \WP_Error( 'craynai_revert_conflict', sprintf( 'Location "%s" was changed after this edit. Revert the newer changes first (see changes-list), newest first.', $slug ) );
 			}
 		}
 		$changes = array();
@@ -1906,7 +1906,7 @@ class MenuAbilities extends AbilitiesBase {
 		foreach ( $changes as $slug => $id ) {
 			$got = isset( $now[ $slug ] ) ? $now[ $slug ] : null;
 			if ( $got !== $id ) {
-				return new \WP_Error( 'crayn_safe_revert_failed', sprintf( 'Location "%s" did not read back as before.', $slug ) );
+				return new \WP_Error( 'craynai_revert_failed', sprintf( 'Location "%s" did not read back as before.', $slug ) );
 			}
 		}
 		return sprintf( 'Restored %d menu location(s): %s.', count( $changes ), implode( ', ', array_keys( $changes ) ) );
