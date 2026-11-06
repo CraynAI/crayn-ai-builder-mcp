@@ -1,6 +1,6 @@
-=== Crayn Safe MCP ===
+=== Crayn AI Builder MCP ===
 Contributors: craynai
-Tags: mcp, ai, agents, abilities-api, automation
+Tags: mcp, ai, agents, page builder, automation
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -8,11 +8,11 @@ Stable tag: 1.0.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-Direct, ready-to-call tools for AI agents, with preview, change log and one-call revert. Built on the official WordPress MCP Adapter.
+Let AI agents build and manage your site safely: MCP tools with preview, change log and one-call revert.
 
 == Description ==
 
-Crayn Safe MCP gives AI agents like Claude Desktop, Claude Code and Cursor a safe way to work on your site.
+Crayn AI Builder MCP gives AI agents like Claude Desktop, Claude Code and Cursor a safe way to work on your site.
 
 **Direct tools.** Every tool is listed to the agent with its full schema, ready to call, with no discover-inspect-execute round trips.
 
@@ -20,7 +20,7 @@ Crayn Safe MCP gives AI agents like Claude Desktop, Claude Code and Cursor a saf
 
 **Works with your stack.** Dedicated tools for Rank Math, WPBakery and Elementor. Rank Math and Yoast's own abilities can be turned on in the settings and go through the same safety layer.
 
-Built on the official WordPress MCP Adapter (GPL), which is included unmodified, so there is nothing else to install. This plugin is developed by Crayn AI and is not affiliated with or endorsed by the WordPress Foundation.
+Built on the official WordPress MCP Adapter (GPL), which is included unmodified, so there is nothing else to install. This plugin is developed by Yunus Doğukan OĞLAKCI (CraynAI) and is not affiliated with or endorsed by the WordPress Foundation.
 
 57 tools in total (the Rank Math, WPBakery and Elementor tools appear only when that plugin is active):
 
@@ -44,15 +44,15 @@ Why it is safe:
 6. A read-only mode switch makes every write ability return an error.
 7. Categories (content/seo/plugins/site/settings) can be enabled or disabled individually from the settings page.
 
-The plugin also creates a custom MCP server with every ability listed as a direct tool at `/wp-json/crayn-safe/v1/mcp`, and keeps `meta.mcp.public = true` so the adapter's default discovery server exposes them too.
+The plugin also creates a custom MCP server with every ability listed as a direct tool at `/wp-json/craynai/v1/mcp`, and keeps `meta.mcp.public = true` so the adapter's default discovery server exposes them too.
 
 == Installation ==
 
-1. Upload the `crayn-safe-mcp` folder to `/wp-content/plugins/` (or install the zip).
+1. Upload the `crayn-ai-builder-mcp` folder to `/wp-content/plugins/` (or install the zip).
 2. Activate the plugin through the 'Plugins' screen. The change-log table is created on activation.
 3. Create a WordPress Application Password (Users > Profile > Application Passwords).
-4. Point your MCP client at `https://yoursite.com/wp-json/crayn-safe/v1/mcp` with HTTP Basic Authentication (username + application password).
-5. Optionally: Settings > Crayn Safe MCP to toggle categories, enable read-only mode and copy the ready-to-use client snippet.
+4. Point your MCP client at `https://yoursite.com/wp-json/craynai/v1/mcp` with HTTP Basic Authentication (username + application password).
+5. Optionally: Settings > Crayn AI Builder MCP to toggle categories, enable read-only mode and copy the ready-to-use client snippet.
 
 == Frequently Asked Questions ==
 
@@ -70,7 +70,7 @@ Yes, pass `dry_run: true` to any write tool and it returns the planned `{before,
 
 = How do I undo something? =
 
-Every write result contains a `change_id`. Call `crayn-safe/changes-list` or use the "Recent changes" table in Settings > Crayn Safe MCP and click Revert (or call `crayn-safe/change-revert`).
+Every write result contains a `change_id`. Call `craynai/changes-list` or use the "Recent changes" table in Settings > Crayn AI Builder MCP and click Revert (or call `craynai/change-revert`).
 
 = What happens if a plugin update breaks the site? =
 
@@ -86,7 +86,7 @@ Tools return site content as it is, so text written by another user can contain 
 
 = Are plugin backups protected on Nginx? =
 
-Backups sit in a folder protected by an `.htaccess` file, and their names contain a random part. Nginx and IIS ignore `.htaccess`, so block the folder in your server configuration, for example `location ~* /crayn-safe-backups/ { deny all; }`.
+Backups sit in a folder protected by an `.htaccess` file, and their names contain a random part. Nginx and IIS ignore `.htaccess`, so block the folder in your server configuration, for example `location ~* /craynai-backups/ { deny all; }`.
 
 == Changelog ==
 

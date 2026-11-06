@@ -1,5 +1,5 @@
 {
-	"name": "crayn-ai/crayn-safe-mcp",
+	"name": "crayn-ai/crayn-ai-builder-mcp",
 	"description": "Bundles the official WordPress MCP Adapter and registers a full set of safe, previewable, revertible abilities (tools) for AI agents.",
 	"license": "GPL-2.0-or-later",
 	"type": "wordpress-plugin",
@@ -12,7 +12,7 @@
 	],
 	"authors": [
 		{
-			"name": "Crayn AI",
+			"name": "Yunus Doğukan OĞLAKCI (CraynAI)",
 			"homepage": "https://www.crayn.ai/"
 		}
 	],

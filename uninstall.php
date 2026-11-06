@@ -1,13 +1,13 @@
 <?php
 /**
- * Uninstall routine for Crayn Safe MCP.
+ * Uninstall routine for Crayn AI Builder MCP.
  *
  * Removes everything the plugin created, per site:
- * - the settings option "crayn_safe_mcp_settings" (real name: Settings::OPTION_NAME),
- * - the change log table "{$wpdb->prefix}crayn_safe_log" (real name: ChangeLogger),
- * - the plugin backups folder under uploads: "crayn-safe-backups"
+ * - the settings option "crayn_ai_builder_mcp_settings" (real name: Settings::OPTION_NAME),
+ * - the change log table "{$wpdb->prefix}craynai_log" (real name: ChangeLogger),
+ * - the plugin backups folder under uploads: "craynai-backups"
  *   (real name: PluginBackup::backup_dir(), parent folder),
- * - the legacy backup folder wp-content/crayn-safe-backups from versions
+ * - the legacy backup folder wp-content/craynai-backups from versions
  *   that stored backups outside uploads.
  *
  * The plugin stores no transients of its own. Rank Math / Yoast options touched
@@ -18,7 +18,7 @@
  * includes/class-settings.php, includes/class-change-logger.php and
  * includes/class-plugin-backup.php.
  *
- * @package CraynSafeMcp
+ * @package CraynAiBuilderMcp
  */
 
 // Exit if uninstall.php was not called by WordPress.
@@ -31,14 +31,14 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  *
  * @return void
  */
-function crayn_safe_mcp_uninstall_site() {
+function crayn_ai_builder_mcp_uninstall_site() {
 	global $wpdb;
 
 	// Settings option.
-	delete_option( 'crayn_safe_mcp_settings' );
+	delete_option( 'crayn_ai_builder_mcp_settings' );
 
 	// Change log table.
-	$table = $wpdb->prefix . 'crayn_safe_log';
+	$table = $wpdb->prefix . 'craynai_log';
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time uninstall cleanup; the table name is $wpdb->prefix . a fixed suffix, never a user value.
 	$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $table ) );
 
@@ -52,9 +52,9 @@ function crayn_safe_mcp_uninstall_site() {
 	$upload_dir = wp_upload_dir();
 	$roots      = array();
 	if ( empty( $upload_dir['error'] ) && ! empty( $upload_dir['basedir'] ) ) {
-		$roots[] = rtrim( $upload_dir['basedir'], '/' ) . '/crayn-safe-backups';
+		$roots[] = rtrim( $upload_dir['basedir'], '/' ) . '/craynai-backups';
 	}
-	$roots[] = WP_CONTENT_DIR . '/crayn-safe-backups';
+	$roots[] = WP_CONTENT_DIR . '/craynai-backups';
 
 	$seen = array();
 	foreach ( $roots as $root ) {
@@ -69,7 +69,7 @@ function crayn_safe_mcp_uninstall_site() {
 }
 
 if ( is_multisite() ) {
-	$crayn_safe_mcp_sites = get_sites(
+	$crayn_ai_builder_mcp_sites = get_sites(
 		array(
 			'fields'             => 'ids',
 			'number'             => 0,
@@ -77,11 +77,11 @@ if ( is_multisite() ) {
 			'update_site_meta_cache' => false,
 		)
 	);
-	foreach ( $crayn_safe_mcp_sites as $crayn_safe_mcp_site_id ) {
-		switch_to_blog( (int) $crayn_safe_mcp_site_id );
-		crayn_safe_mcp_uninstall_site();
+	foreach ( $crayn_ai_builder_mcp_sites as $crayn_ai_builder_mcp_site_id ) {
+		switch_to_blog( (int) $crayn_ai_builder_mcp_site_id );
+		crayn_ai_builder_mcp_uninstall_site();
 		restore_current_blog();
 	}
 } else {
-	crayn_safe_mcp_uninstall_site();
+	crayn_ai_builder_mcp_uninstall_site();
 }
