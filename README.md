@@ -48,8 +48,7 @@ Selling point of every write tool: **preview first, log everything, revert anyth
    (reads and dry runs still work).
 7. **Per-category on/off.** Content, SEO, plugins, site and settings categories can be disabled
    independently; disabled abilities are not registered at all. The *settings* category
-   (site settings and menus) is on for new installs; on a site that saved its settings
-   before this category existed, tick it under **Settings → Crayn Safe MCP**.
+   (site settings and menus) is on by default.
 
 ## What it registers
 
@@ -171,7 +170,7 @@ Never writable, even through the filter: `siteurl`, `home`, `admin_email`, `new_
 
 ### Menus (`crayn-settings`)
 
-Needs the `edit_theme_options` capability. Every write stores a snapshot of the whole menu (items, parents, order, locations), so a revert is exact on title, url, parent and order; a revert is refused if the menu changed afterwards. Reverting a deleted menu or item recreates it with new ids and re-maps the parents.
+Needs the `edit_theme_options` capability. Every write stores a snapshot of the whole menu (items, parents, order, locations), so a revert is exact on title, url, parent and order; a revert is refused if the menu changed afterwards. Reverting a deleted menu or item recreates it and re-maps the parents; items keep their old ids when those are free.
 
 | Tool | Writes | What it does |
 | --- | --- | --- |
