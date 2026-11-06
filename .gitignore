@@ -1,0 +1,19 @@
+# vendor/ ships in the release zip, not in this repository.
+vendor/
+
+# Runtime artifacts
+node_modules/
+
+# Hidden OS files
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local dev artifacts
+wp-content/
+*.log
