@@ -182,7 +182,7 @@ class AdminPage {
 							<label>
 								<input type="checkbox" name="<?php echo esc_attr( Settings::OPTION_NAME ); ?>[external_abilities]" value="1"
 									<?php checked( Settings::external_abilities() ); ?> />
-								<?php esc_html_e( 'Expose the abilities of Rank Math and Yoast SEO. Read-only ones are listed directly; writing ones only through safe wrappers (dry run, option snapshot, change log, revert).', 'crayn-safe-mcp' ); ?>
+								<?php esc_html_e( 'Also list the abilities of Rank Math and Yoast SEO as tools (up to about 40 more, which makes the tool list much larger). Read-only ones are listed directly; writing ones only through safe wrappers (dry run, option snapshot, change log, revert). Off by default; the built-in SEO and Rank Math tools work either way.', 'crayn-safe-mcp' ); ?>
 							</label>
 						</td>
 					</tr>

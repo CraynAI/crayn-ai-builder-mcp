@@ -43,7 +43,7 @@ class Settings {
 		return array(
 			'enabled_categories' => array( 'content', 'seo', 'plugins', 'site', 'settings' ),
 			'read_only'          => false,
-			'external_abilities' => true,
+			'external_abilities' => false,
 		);
 	}
 

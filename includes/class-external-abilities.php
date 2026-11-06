@@ -74,12 +74,15 @@ class ExternalAbilities {
 	/**
 	 * Hide original writing abilities from MCP discovery (they stay callable inside PHP).
 	 *
+	 * This holds whatever the external_abilities setting says: turning the setting off
+	 * must never leave a raw, unlogged writing ability on the adapter's default server.
+	 *
 	 * @param array  $args Ability args.
 	 * @param string $name Ability name.
 	 * @return array
 	 */
 	public static function filter_args( $args, $name ) {
-		if ( ! is_array( $args ) || ! self::handled( (string) $name ) || ! Settings::external_abilities() ) {
+		if ( ! is_array( $args ) || ! self::handled( (string) $name ) ) {
 			return $args;
 		}
 		if ( empty( $args['meta']['mcp']['public'] ) ) {
