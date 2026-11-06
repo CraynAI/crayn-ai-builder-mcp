@@ -1,3 +1,5 @@
+![Crayn AI Builder MCP: AI agents build and manage your WordPress site. You preview, log and undo every change.](https://raw.githubusercontent.com/CraynAI/crayn-ai-builder-mcp/main/assets/banner.png)
+
 # Crayn AI Builder MCP
 
 Direct, ready-to-call tools for AI agents, with a safety layer on every write: preview, change log and one-call revert. Plugin updates take a backup and roll back automatically if the site breaks.
